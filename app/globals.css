@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --color-navy: #17243a;
+  --color-navy-deep: #0b1b33;
+  --color-ink: #17243a;
+  --color-gold: #b58a5a;
+  --color-gold-deep: #a8884e;
+  --color-sand: #f3f5f7;
+  --color-line: #d9dee6;
+  --color-muted: #717784;
+  --font-sans: "Gilroy", var(--font-geist), sans-serif;
+  --font-serif: "Gilroy", var(--font-geist), sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f3f5f7;
+  color: #17243a;
+  font-family: "Gilroy", var(--font-geist), sans-serif;
+}
+
+.font-geist {
+  font-family: var(--font-geist), sans-serif;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: #b58a5a;
+  color: #0e2240;
+}
+
+@property --wipe-offset {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.page-shell {
+  min-height: 100%;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.scroll-reveal.is-in {
+  animation: scroll-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hover-roll {
+  display: inline-grid;
+  height: 1.2em;
+  overflow: hidden;
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+.hover-roll-line {
+  display: flex;
+}
+
+.hover-roll-line > span {
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.hover-roll:hover .hover-roll-line > span {
+  transform: translateY(-100%);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: #17243a;
+}
+
+.preloader-logo {
+  animation: preloader-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.preloader-leave {
+  animation: preloader-out 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes preloader-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes preloader-out {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes scroll-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.is-transitioning {
+  overflow: hidden;
+}
+
+.page-shell.page-exit,
+.page-shell.page-enter {
+  pointer-events: none;
+}
+
+.page-shell.page-exit {
+  animation: vt-exit 0.6s cubic-bezier(1, 0, 1, 1) forwards;
+  mask-image: linear-gradient(
+    360deg,
+    transparent calc(100% * var(--wipe-offset)),
+    black calc(100% * var(--wipe-offset))
+  );
+}
+
+.page-shell.page-enter {
+  animation: vt-enter 0.6s cubic-bezier(0, 0, 0, 1) both;
+  mask-image: linear-gradient(
+    360deg,
+    black calc(100% * var(--wipe-offset)),
+    transparent calc(100% * var(--wipe-offset))
+  );
+}
+
+@keyframes vt-exit {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+    --wipe-offset: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -20%);
+    --wipe-offset: 1;
+  }
+}
+
+@keyframes vt-enter {
+  from {
+    opacity: 1;
+    transform: translate(0, 20%);
+    --wipe-offset: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+    --wipe-offset: 1;
+  }
+}
+
