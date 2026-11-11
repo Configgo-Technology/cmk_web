@@ -12,6 +12,16 @@ function projectAsset(slug: string, file: string, fallback: string) {
   return existsSync(full) ? `/images/projects/${slug}/${file}` : fallback;
 }
 
+function youtubeEmbed(url: string) {
+  const match = url.match(/(?:youtu\.be\/|embed\/|watch\?v=|v\/)([A-Za-z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+}
+
+function mapEmbed(name: string, query: string, point?: [number, number]) {
+  const q = point ? `${name}@${point[0]},${point[1]}` : query;
+  return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=16&hl=tr&output=embed`;
+}
+
 type Params = { slug: string };
 
 const FACT_ICONS = [
@@ -54,16 +64,18 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   if (!project || !project.hasDetail) notFound();
 
   const gallery = projectGallery(slug);
-  const midGallery = [3, 4, 5, 6].map((n) =>
-    projectAsset(slug, `${n}.jpg`, gallery[Math.min(n - 1, gallery.length - 1)] ?? gallery[0]),
-  );
+  const midGallery = [3, 4, 5, 6].flatMap((n) => {
+    const file = `${n}.jpg`;
+    const full = path.join(process.cwd(), "public", "images", "projects", slug, file);
+    return existsSync(full) ? [`/images/projects/${slug}/${file}`] : [];
+  });
   const socialImage = projectAsset(slug, "7.jpg", gallery[2] ?? gallery[0]);
   const technicalImage = projectAsset(slug, "8.jpg", gallery[3] ?? gallery[0]);
   const videoImage = projectAsset(slug, "9.jpg", gallery[4] ?? gallery[0]);
   const mapImage = projectAsset(slug, "10.jpg", "/images/map-altindag.jpg");
 
   const facts = [
-    ["PROJE KATEGORİSİ", project.category],
+    ["PROJE KATEGORİSİ", project.categoryLabel ?? project.category],
     ["BAŞLANGIÇ / BİTİŞ TARİHİ", project.dates],
     ["ÜSTLENEN FİRMA", project.company],
     ["PROJE WEBSİTESİ", project.website?.replace(/^https?:\/\//, "") ?? ""],
@@ -79,6 +91,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
           { label: project.name },
         ]}
         lines={project.titleLines}
+        wash="navy"
       />
 
       <Reveal>
@@ -171,28 +184,40 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
         <section className="bg-white">
           <div
             className={`mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:px-[70px] ${
-              project.socialItems.length > 0 ? "md:grid-cols-2" : ""
+              project.showSocialImage || project.socialItems.length > 0 ? "md:grid-cols-2 md:items-stretch" : ""
             }`}
           >
             <div>
-              <h2 className="font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
-                {project.socialTitle}
-                {project.socialAccent ? (
-                  <span className="block text-gold">{project.socialAccent}</span>
-                ) : null}
-              </h2>
-              {project.socialText ? (
-                <p className="mt-4 max-w-3xl text-base leading-6 text-muted">{project.socialText}</p>
+              {project.socialTitle ? (
+                <h2 className="font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
+                  {project.socialTitle}
+                  {project.socialAccent ? (
+                    <span className="block text-gold">{project.socialAccent}</span>
+                  ) : null}
+                </h2>
               ) : null}
+              {project.socialText
+                ? project.socialText.split(/\n\n+/).map((paragraph) => (
+                    <p key={paragraph} className="mt-4 text-base leading-6 text-muted">
+                      {paragraph}
+                    </p>
+                  ))
+                : null}
               <ChipGrid items={project.socialItems} />
             </div>
-            {project.socialItems.length > 0 ? (
+            {project.showSocialImage || project.socialItems.length > 0 ? (
               <Image
                 src={socialImage}
                 alt=""
                 width={900}
                 height={640}
-                className="h-80 w-full object-cover"
+                className={
+                  project.socialImageSquare
+                    ? "aspect-square h-auto w-full self-center object-cover"
+                    : project.showSocialImage && project.socialItems.length === 0
+                      ? "aspect-video h-auto w-full self-center object-cover"
+                      : "h-80 w-full object-cover"
+                }
               />
             ) : null}
           </div>
@@ -225,7 +250,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
         </section>
       )}
 
-      {project.showVideo !== false ? (
+      {project.videoUrl || project.showVideo !== false ? (
         <section className="bg-white">
           <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:grid-cols-2 md:px-[70px]">
             <div>
@@ -242,13 +267,26 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
                 keşfedin.
               </p>
             </div>
-            <Image src={videoImage} alt="" width={1000} height={640} className="h-72 w-full object-cover" />
+            {project.videoUrl ? (
+              <div className="aspect-video w-full overflow-hidden bg-[#0B0D10]">
+                <iframe
+                  src={youtubeEmbed(project.videoUrl)}
+                  title={`${project.name} tanıtım videosu`}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <Image src={videoImage} alt="" width={1000} height={640} className="h-72 w-full object-cover" />
+            )}
           </div>
         </section>
       ) : null}
 
       <section className="bg-white">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:px-[70px]">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:grid-cols-2 md:px-[70px]">
           <div>
             <div className="flex items-center gap-4">
               <p className="text-base leading-none text-muted">{project.sectionLabel}</p>
@@ -262,7 +300,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               {project.name}, Ankara&apos;da konforlu ve ulaşımı kolay bir lokasyonda yer almaktadır.
             </p>
           </div>
-          <Image src={mapImage} alt="Proje konumu" width={1000} height={640} className="h-72 w-full object-cover" />
+          {project.mapQuery ? (
+            <iframe
+              title={`${project.name} konumu`}
+              src={mapEmbed(project.name, project.mapQuery, project.mapPoint)}
+              className="aspect-video h-auto w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          ) : (
+            <Image src={mapImage} alt="Proje konumu" width={1000} height={640} className="h-72 w-full object-cover" />
+          )}
         </div>
       </section>
     </main>

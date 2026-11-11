@@ -8,12 +8,15 @@ export default function PageHero({
   title,
   text,
   lines,
+  wash = "black",
 }: {
   image: string;
   crumbs: Crumb[];
   title?: string;
   text?: string;
   lines?: [string, string];
+  /** Proje kapaklarında Figma’daki saydam lacivert geçiş */
+  wash?: "black" | "navy";
 }) {
   return (
     <section className="relative min-h-[460px] overflow-hidden bg-navy text-white">
@@ -21,7 +24,17 @@ export default function PageHero({
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${image})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/20" />
+      <div
+        className={wash === "navy" ? "absolute inset-0" : "absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/20"}
+        style={
+          wash === "navy"
+            ? {
+                background:
+                  "linear-gradient(90deg, rgba(23,36,58,0.88) 0%, rgba(23,36,58,0.62) 28%, rgba(23,36,58,0.28) 55%, rgba(23,36,58,0) 82%)",
+              }
+            : undefined
+        }
+      />
       <div className="relative mx-auto flex min-h-[460px] max-w-[1200px] flex-col justify-end px-5 pb-14 pt-32 md:px-8">
         <p className="text-sm text-white/80">
           {crumbs.map((crumb, index) => (

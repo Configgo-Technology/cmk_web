@@ -6,6 +6,7 @@ export default function ProjectCard({ project }: { project: Project }) {
   const href = project.hasDetail ? `/projeler/${project.slug}` : "/projeler";
   const excerpt =
     project.excerpt.length > 140 ? `${project.excerpt.slice(0, 137).trimEnd()}…` : project.excerpt;
+  const coverClass = "h-52 w-full object-cover";
 
   return (
     <article
@@ -14,23 +15,25 @@ export default function ProjectCard({ project }: { project: Project }) {
       data-preview={`/images/projects/${project.slug}/1.jpg`}
     >
       {project.hasDetail ? (
-        <Link href={href} className="block">
+        <Link href={href} className="block h-52 overflow-hidden">
           <Image
             src={`/images/projects/${project.slug}/1.jpg`}
             alt={project.name}
             width={900}
             height={560}
-            className="h-52 w-full object-cover"
+            className={coverClass}
           />
         </Link>
       ) : (
-        <Image
-          src={`/images/projects/${project.slug}/1.jpg`}
-          alt={project.name}
-          width={900}
-          height={560}
-          className="h-52 w-full object-cover"
-        />
+        <div className="h-52 overflow-hidden">
+          <Image
+            src={`/images/projects/${project.slug}/1.jpg`}
+            alt={project.name}
+            width={900}
+            height={560}
+            className={coverClass}
+          />
+        </div>
       )}
       <div className="px-4 py-5">
         <p className="text-[11px] tracking-[0.14em] text-muted">{projectListLabel(project.category)}</p>
