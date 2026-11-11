@@ -1,142 +1,124 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import PageHero from "@/components/PageHero";
-import ProcessBand from "@/components/ProcessBand";
+import HeroStage from "@/components/HeroStage";
+import Marquee from "@/components/Marquee";
+import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
+import { getProject, homePreviewSlugs } from "@/data/projects";
+import { aboutCopy, brands, corporateHero } from "@/data/site";
 
-export const metadata: Metadata = { title: "Hakkımızda" };
+export const metadata: Metadata = { title: "Kurumsal" };
+
+const preview = homePreviewSlugs
+  .map((slug) => getProject(slug))
+  .filter((project): project is NonNullable<typeof project> => Boolean(project));
 
 export default function AboutPage() {
   return (
     <main>
-      <PageHero
-        image="/images/about-buildings.jpg"
-        crumbs={[
-          { href: "/", label: "Anasayfa" },
-          { label: "Hakkımızda" },
-        ]}
-        title="Hakkımızda"
-        text="Daha yaşanabilir şehirler, daha güçlü bir gelecek için değer inşa ediyoruz."
-      />
+      <HeroStage
+        image="/images/hero-kurumsal.jpg"
+        alt="Kurumsal bakış — modern mimari içinde siluet"
+        objectPosition="55% center"
+      >
+        <section className="flex w-full max-w-[760px] flex-col items-start gap-8 text-white">
+          <h1 className="w-full text-[40px] font-normal leading-none tracking-[-1px] md:text-[72px] md:tracking-[-1.8px]">
+            <span className="block">{corporateHero.lines[0]}</span>
+            <span className="block">{corporateHero.lines[1]}</span>
+          </h1>
+          <p className="max-w-[355px] text-base font-normal leading-6 text-white">{corporateHero.text}</p>
+        </section>
+      </HeroStage>
 
-      <section className="bg-sand">
-        <div className="mx-auto grid max-w-[1200px] gap-8 px-5 py-20 md:grid-cols-2 md:px-8">
-          <div>
-            <div className="flex items-center gap-4">
-              <p className="text-[11px] tracking-[0.18em] text-muted">CMK HOLDING HAKKINDA</p>
-              <span className="h-px w-14 bg-gold" />
-            </div>
-            <h2 className="mt-4 font-geist text-4xl leading-tight text-ink md:text-5xl">
-              Sadece yapı değil,
-              <span className="block text-gold">değer inşa ediyoruz.</span>
-            </h2>
-            <p className="mt-6 text-sm leading-7 text-muted">
-              CMK HOLDING, 2014 yılında kurulmuş olup, sahip olduğu teknik birikim, uzman kadro ve çok sektörlü
-              yapısıyla inşaat, restorasyon, enerji ve otomotiv gibi farklı alanlarda faaliyet göstermektedir.
-              Kuruluşumuzdan bu yana; hem modern şehir yaşamına katkı sağlayan güncel üstyapı projeleri hem de
-              kültürel miras niteliğindeki taşınmaz varlıkların özenli restorasyonu ile sektörde saygın bir yer
-              edindik.
-            </p>
-            <Image
-              src="/images/projects/aydinlikevler/1.jpg"
-              alt="CMK konut projesi"
-              width={900}
-              height={600}
-              className="mt-8 h-64 w-full object-cover"
-            />
-          </div>
-          <div>
-            <Image
-              src="/images/projects/kent-rose/2.jpg"
-              alt="CMK ticari ve konut blokları"
-              width={900}
-              height={600}
-              className="h-64 w-full object-cover"
-            />
-            <div className="mt-6 space-y-4 text-sm leading-7 text-muted">
-              <p>
-                Bugünü ve yarını daha yaşanır kılma hedefiyle, projelerimizde teknik yeterliliğimizi, kalite odaklı
-                yaklaşımımızı ve kullanıcı beklentilerini temel alıyoruz. Fonksiyonel, sağlam, mimari ve mühendislik
-                kriterlerine uygun, standartların üzerinde yapılar üretirken; çevreyle uyumlu, insan odaklı yaşam ve
-                çalışma alanları yaratmayı esas alıyoruz.
-              </p>
-              <p>
-                Bu yapıların, coğrafyamızın tarihsel birikimini taşıyan ve kültürel kimliğimizi yansıtan öğeler
-                olduğunu kabul ederek, bilimsel disiplinlere uygun restorasyon anlayışımızla onları geleceğe
-                kazandırıyoruz. Geçmişin izlerini taşıyan bu yapılarla bugünü buluşturmak, CMK HOLDING&apos;in en temel
-                sorumluluk alanlarından biridir.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Marquee />
 
       <Reveal>
-      <section className="bg-navy text-white">
-        <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8">
-          <div>
-            <div className="flex items-center gap-4">
-              <p className="text-[11px] tracking-[0.18em] text-white/70">CMK HOLDING HAKKINDA</p>
-              <span className="h-px w-14 bg-gold" />
+        <section className="relative z-10 -mt-16 bg-sand">
+          <div className="mx-auto grid max-w-[1440px] items-start gap-10 px-5 py-20 md:grid-cols-2 md:px-[70px]">
+            <div>
+              <div className="flex items-center gap-4">
+                <p className="text-base leading-none text-muted">{aboutCopy.eyebrow}</p>
+                <span className="h-px w-14 bg-gold" />
+              </div>
+              <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
+                {aboutCopy.title}
+                <span className="block text-gold">{aboutCopy.accent}</span>
+              </h2>
             </div>
-            <h2 className="mt-4 font-geist text-4xl leading-tight md:text-5xl">
-              Sadece yapı değil,
-              <span className="block text-gold">değer inşa ediyoruz.</span>
-            </h2>
-            <p className="mt-6 text-sm leading-7 text-white/75">
-              Taşınmaz kültür varlıklarının yalnızca mimari değil, aynı zamanda toplumsal ve kültürel birer hafıza
-              olduğunun bilinciyle hareket ediyoruz. Tarihsel birikimimizi ve kültürel kimliğimizi yansıtan bu yapıları,
-              bilimsel ilkelere uygun restorasyon anlayışımızla koruyarak gelecek nesillere aktarıyoruz.
-            </p>
+            <div className="space-y-4 text-xl leading-7 text-muted">
+              {aboutCopy.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
           </div>
-          <Image
-            src="/images/hero-home.jpg"
-            alt="CMK yaşam alanı"
-            width={1200}
-            height={800}
-            className="h-72 w-full object-cover"
-          />
-        </div>
-      </section>
+          <div className="mx-auto max-w-[1440px] px-5 pb-10 md:px-[70px]">
+            <Image
+              src="/images/about-buildings.jpg"
+              alt="CMK konut blokları"
+              width={1300}
+              height={426}
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        </section>
       </Reveal>
 
-      <section className="bg-sand">
-        <div className="mx-auto grid max-w-[1200px] gap-6 px-5 py-16 md:grid-cols-2 md:px-8">
-          <article className="border border-line bg-white p-8">
-            <h2 className="font-geist text-4xl text-gold">Vizyonumuz</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-muted">
-              <p>
-                CMK HOLDING olarak vizyonumuz; iş yaşamındaki deneyim ve birikimimizi, ülke ekonomisine değer katacak
-                farklı sektörlerdeki iş fikirlerini tek bir çatı altında hayata geçirerek, faaliyet gösterdiğimiz her
-                alanda kalite, güven ve sürdürülebilirliği ön planda tutmaktır.
-              </p>
-              <p>
-                Tarihi ve kültürel mirasın korunmasından modern projelerin inşasına kadar geniş bir alanda, toplumsal
-                fayda sağlayan, estetik ve mühendisliği birleştiren çalışmalara imza atarak sektörün öncü ve güvenilir
-                markalarından biri olmayı hedefliyoruz.
-              </p>
-            </div>
-            <span className="mt-8 block h-px w-16 bg-gold" />
-          </article>
-          <article className="bg-gold-deep p-8 text-white">
-            <h2 className="font-geist text-4xl">Misyonumuz</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-white/90">
-              <p>
-                CMK HOLDING olarak misyonumuz; tarihi ve kültürel mirasımızı koruyarak gelecek nesillere aktarmak,
-                modern şehir yaşamına katkı sağlayacak projeler geliştirmek ve faaliyet gösterdiğimiz her alanda kalite,
-                güven ve sürdürülebilirliği esas alarak fark yaratmaktır.
-              </p>
-              <p>
-                Restorasyon, inşaat, enerji ve otomotiv gibi çok disiplinli alanlarda uzmanlığımızla, hem toplumsal hem
-                de çevresel sorumluluklarımızın bilinciyle, estetik ve işlevselliği bir araya getiren kalıcı çözümler
-                üretmeyi hedefliyoruz.
+      <Reveal>
+        <section className="bg-sand">
+          <div className="mx-auto max-w-[1440px] px-5 py-8 md:px-[70px]">
+            <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-end">
+              <div>
+                <div className="flex items-center gap-4">
+                  <p className="text-base leading-none text-muted">PROJELERİMİZ</p>
+                  <span className="h-px w-14 bg-gold" />
+                </div>
+                <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
+                  Daha iyi yaşam alanları
+                  <span className="block text-gold">için çalışıyoruz.</span>
+                </h2>
+              </div>
+              <p className="text-base leading-7 text-muted">
+                CMK Holding, stratejik yatırımları ve bütüncül yaklaşımıyla insan odaklı, sürdürülebilir ve uzun
+                vadeli değerler üretir.
               </p>
             </div>
-          </article>
-        </div>
-      </section>
+            <div className="mt-10 grid gap-8 md:grid-cols-3">
+              {preview.map((project) => (
+                <ProjectCard key={project.slug} project={project} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
 
-      <ProcessBand />
+      <Reveal>
+        <section className="bg-white">
+          <div className="mx-auto max-w-[1440px] px-5 py-16 md:px-[70px]">
+            <div className="flex items-center gap-4">
+              <p className="text-base leading-none text-muted">REFERANSLARIMIZ</p>
+              <span className="h-px w-14 bg-gold" />
+            </div>
+            <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
+              Daha iyi yaşam alanları
+              <span className="block text-gold">Markalarımız</span>
+            </h2>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {brands.map((brand) => (
+                <div key={brand.alt} className="grid h-[164px] place-items-center border border-line bg-white px-4">
+                  <Image
+                    src={brand.src}
+                    alt={brand.alt}
+                    width={290}
+                    height={120}
+                    className="max-h-[120px] w-auto max-w-full object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
     </main>
   );
 }

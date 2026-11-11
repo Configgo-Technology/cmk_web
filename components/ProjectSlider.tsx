@@ -3,10 +3,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import ProjectCard from "./ProjectCard";
+import type { Project } from "@/data/projects";
 
-type Item = { slug: string; name: string; category: string };
-
-export default function ProjectSlider({ items }: { items: Item[] }) {
+export default function ProjectSlider({ items }: { items: Project[] }) {
   const [index, setIndex] = useState(0);
   const visible = 3;
   const max = Math.max(items.length - visible, 0);
@@ -17,16 +16,16 @@ export default function ProjectSlider({ items }: { items: Item[] }) {
     <div>
       <div className="grid gap-5 md:grid-cols-3">
         <AnimatePresence mode="popLayout" initial={false}>
-          {slice.map((item, itemIndex) => (
+          {slice.map((item) => (
             <motion.div
-              key={`${item.slug}-${start + itemIndex}`}
+              key={`${item.slug}-${start}`}
               layout
               initial={{ opacity: 0, x: 48 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -48 }}
               transition={{ duration: 0.45, ease: [0.76, 0, 0.24, 1] }}
             >
-              <ProjectCard {...item} />
+              <ProjectCard project={item} />
             </motion.div>
           ))}
         </AnimatePresence>

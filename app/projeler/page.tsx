@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
-import ProcessBand from "@/components/ProcessBand";
+import ProjectListing from "@/components/ProjectListing";
 import Reveal from "@/components/Reveal";
-import ProjectCard from "@/components/ProjectCard";
 import { getProject, listingSlugs } from "@/data/projects";
 
 export const metadata: Metadata = { title: "Projeler" };
@@ -15,7 +14,7 @@ export default function ProjectsPage() {
   return (
     <main>
       <PageHero
-        image="/images/projects/kule/1.jpg"
+        image="/images/hero-pages.jpg"
         crumbs={[
           { href: "/", label: "Anasayfa" },
           { label: "Projeler" },
@@ -24,38 +23,28 @@ export default function ProjectsPage() {
         text="Yaşanabilir şehirler için, bugünü ve yarını düşünen projeler geliştiriyoruz."
       />
       <Reveal>
-      <section className="bg-sand">
-        <div className="mx-auto max-w-[1200px] px-5 py-16 md:px-8">
-          <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-end">
-            <div>
-              <div className="flex items-center gap-4">
-                <p className="text-[11px] tracking-[0.18em] text-muted">PROJELERİMİZ</p>
-                <span className="h-px w-14 bg-gold" />
+        <section className="bg-sand">
+          <div className="mx-auto max-w-[1440px] px-5 py-16 md:px-[70px]">
+            <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-end">
+              <div>
+                <div className="flex items-center gap-4">
+                  <p className="text-base leading-none text-muted">PROJELERİMİZ</p>
+                  <span className="h-px w-14 bg-gold" />
+                </div>
+                <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
+                  Daha iyi yaşam alanları
+                  <span className="block text-gold">için çalışıyoruz.</span>
+                </h2>
               </div>
-              <h2 className="mt-4 font-geist text-4xl leading-tight text-ink md:text-5xl">
-                Daha iyi yaşam alanları
-                <span className="block text-gold">için çalışıyoruz.</span>
-              </h2>
+              <p className="text-base leading-7 text-muted">
+                CMK Holding, stratejik yatırımları ve bütüncül yaklaşımıyla insan odaklı, sürdürülebilir ve uzun
+                vadeli değerler üretir.
+              </p>
             </div>
-            <p className="text-sm leading-7 text-muted">
-              CMK Holding, stratejik yatırımları ve bütüncül yaklaşımıyla insan odaklı, sürdürülebilir ve uzun vadeli
-              değerler üretir.
-            </p>
+            <ProjectListing projects={cards} />
           </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {cards.map((project, index) => (
-              <ProjectCard
-                key={`${project.slug}-${index}`}
-                slug={project.slug}
-                name={project.name}
-                category={project.listCategory}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
       </Reveal>
-      <ProcessBand />
     </main>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 import PageHero from "@/components/PageHero";
-import ProcessBand from "@/components/ProcessBand";
 import Reveal from "@/components/Reveal";
 import { contact } from "@/data/site";
 
@@ -17,7 +16,7 @@ export default function ContactPage() {
   return (
     <main>
       <PageHero
-        image="/images/projects/lumina/1.jpg"
+        image="/images/hero-pages.jpg"
         crumbs={[
           { href: "/", label: "Anasayfa" },
           { label: "İletişim" },
@@ -31,7 +30,7 @@ export default function ContactPage() {
         <div className="mx-auto grid max-w-[1200px] gap-12 px-5 py-16 md:grid-cols-2 md:px-8">
           <div>
             <div className="flex items-center gap-4">
-              <p className="text-[11px] tracking-[0.18em] text-muted">BİZE ULAŞIN</p>
+              <p className="text-base leading-none text-muted">BİZE ULAŞIN</p>
               <span className="h-px w-14 bg-gold" />
             </div>
             <h2 className="mt-4 font-geist text-4xl leading-tight text-ink md:text-5xl">
@@ -68,7 +67,7 @@ export default function ContactPage() {
 
           <div>
             <div className="flex items-center gap-4">
-              <p className="text-[11px] tracking-[0.18em] text-muted">İLETİŞİM FORMU</p>
+              <p className="text-base leading-none text-muted">İLETİŞİM FORMU</p>
               <span className="h-px w-14 bg-gold" />
             </div>
             <h2 className="mt-4 font-geist text-4xl leading-tight text-ink md:text-5xl">
@@ -108,7 +107,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <ProcessBand />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import AboutBand from "@/components/AboutBand";
 import CursorLabel from "@/components/CursorLabel";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -9,6 +10,7 @@ import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
   variable: "--font-geist",
 });
 
@@ -30,6 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <PageTransition>
           <Header />
           {children}
+          <AboutBand />
           <Footer />
         </PageTransition>
       </body>

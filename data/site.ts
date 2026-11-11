@@ -7,8 +7,8 @@ export const nav = [
 
 export const contact = {
   addressLines: [
-    "Aydınlıkevler, Uzayan Sk. No:169 / 1,",
-    "06130 Altındağ / Ankara",
+    "Aydınlıkevler, Uzayan Sk. No:169/1,",
+    "06130 Altındağ/Ankara",
   ],
   phone: "444 3 265",
   phoneHref: "tel:4443265",
@@ -17,11 +17,30 @@ export const contact = {
   mapQuery: "Aydınlıkevler, Uzayan Sk. No:169/1, 06130 Altındağ/Ankara",
 };
 
-export const subjects = [
+/** CRM `project` alanı — PDF başlıklarıyla aynı yazım */
+export const leadProjects = [
+  "Asgardia Kent Rose",
+  "Asgardia Kent Lotus",
+  "Asgardia Meydan",
+  "Asgardia Lumina",
+  "Asgardia Park Caddesi",
+  "Nova Sanayi Sitesi",
+  "Anadolu Medeniyetler Müzesi",
+  "Gazi Üniversitesi Rektörlük Binası",
+  "Asgardia Aydınlıkevler",
+  "Asgardia Motors",
+  "Tarihi Diyarbakır Surları",
+  "Eski Maliye Binası",
+  "Hazine Müzesi",
+  "Maliye Bakanlığı Döner Sermaye Binaları",
+  "Tarihi Sümerbank Binası",
+  "İlk Başbakanlık Binası",
+  "Tarihi Defterdarlık Binası Güçlendirmesi",
+  "Maliye Bakanlığı Yüksek Eğitim Merkez Binası Güçlendirmesi",
+  "Akaryakıt İstasyonu İnşaatı",
+  "Kreş Binası",
+  "Kültür Merkezi Binası",
   "Genel Bilgi",
-  "Projeler",
-  "İş Birliği",
-  "Diğer",
 ] as const;
 
 export const processSteps = [
@@ -54,8 +73,41 @@ export const brands = [
   { src: "/images/brand-barok.png", alt: "Barok Enerji" },
 ] as const;
 
-export const lorem =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+export const homeAbout = {
+  eyebrow: "HAKKIMIZDA",
+  title: "Geçmişten güç alır, geleceği inşa ederiz.",
+  text: "2014 yılından bu yana CMK HOLDİNG olarak inşaat, restorasyon, enerji ve otomotiv sektörlerinde faaliyet gösteriyoruz. Teknik uzmanlığımızı, kalite odaklı yaklaşımımızla birleştirerek modern yapılar üretiyor, kültürel mirası geleceğe taşıyoruz.",
+  cta: "CMK HOLDİNG Hakkında",
+  ctaHref: "/kurumsal",
+  stats: [
+    { value: "2014", label: "Kuruluş yılı" },
+    { value: "+4", label: "Ana faaliyet alanı" },
+    { value: "+12", label: "Yıllık sektör deneyimi" },
+    { value: "360°", label: "Çok yönlü hizmet yaklaşımı" },
+  ],
+} as const;
+
+export const aboutCopy = {
+  eyebrow: "CMK HOLDİNG HAKKINDA",
+  title: "Geleceği inşa ederken",
+  accent: "değer üretiyoruz.",
+  body: [
+    "2014 yılında kurulan CMK HOLDİNG; inşaat, restorasyon, enerji ve otomotiv sektörlerinde faaliyet göstermektedir.",
+    "Kalite, güven ve sürdürülebilirlik odaklı yaklaşımıyla modern yapılar üretirken kültürel mirası geleceğe taşıyor, yalnızca yapılar değil, kalıcı değerler inşa ediyor.",
+  ],
+} as const;
+
+export const homeHero = {
+  lines: ["Yaşam Alanları", "Geleceği", "Şekillendirir."] as const,
+  text: "CMK Holding, farklı sektörlerdeki yatırımları ve sürdürülebilir projeleriyle, insan odaklı, modern ve kalıcı değerler üretir.",
+  cta: "İletişime Geç",
+  ctaHref: "/iletisim",
+} as const;
+
+export const corporateHero = {
+  lines: ["Geçmişten güç alır,", "geleceğe değer katarız."] as const,
+  text: "CMK Holding, farklı sektörlerdeki yatırımları ve sürdürülebilir projeleriyle, insan odaklı, modern ve kalıcı değerler üretir.",
+} as const;
 
 export const sharedVideo = {
   eyebrow: "ASGARDIA KENT ROSE",

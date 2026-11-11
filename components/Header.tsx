@@ -17,9 +17,16 @@ export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const onLightHero = pathname === "/";
+  const onDarkHero =
+    pathname === "/" ||
+    pathname === "/kurumsal" ||
+    pathname === "/projeler" ||
+    pathname.startsWith("/projeler/") ||
+    pathname === "/iletisim";
   const solid = scrolled || open;
-  const linkColor = solid || onLightHero ? "text-[#17243A]" : "text-white";
+  const overHero = onDarkHero && !solid;
+  const linkColor = overHero ? "text-white" : "text-[#17243A]";
+  const activeRule = overHero ? "after:bg-white" : "after:bg-[#B58A5A]";
 
   useEffect(() => {
     setOpen(false);
@@ -41,28 +48,33 @@ export default function Header() {
 
   return (
     <>
-      <header className={`fixed inset-x-0 top-0 z-50 h-[120px] ${solid ? "bg-[#F3F5F7]" : "bg-transparent"}`}>
-        <div className="mx-auto flex h-full max-w-[1440px] items-center px-5 md:px-[70px]">
+      <header className={`fixed inset-x-0 top-0 z-50 h-[120px] md:h-[140px] ${solid ? "bg-[#F3F5F7]" : "bg-transparent"}`}>
+        <div className="mx-auto flex h-full max-w-[1440px] items-center px-5 md:px-16">
           <Link href="/" className="relative z-10 block shrink-0">
             <Image
-              src="/images/logo-gold.png"
+              src={overHero ? "/images/logo-gold.png" : "/images/logo-dark.png"}
               alt="CMK Holding"
-              width={56}
-              height={48}
+              width={237}
+              height={96}
               className="h-12 w-auto"
               style={{ width: "auto", height: "48px" }}
               priority
+              sizes="118px"
+              quality={100}
             />
           </Link>
 
-          <nav className={`ml-[104px] hidden items-center gap-4 md:flex ${open ? "invisible" : ""}`} aria-label="Ana menü">
+          <nav
+            className={`absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 md:flex ${open ? "invisible" : ""}`}
+            aria-label="Ana menü"
+          >
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-base font-normal leading-6 ${linkColor} ${
+                className={`relative text-base font-normal leading-6 ${linkColor} ${
                   isActive(pathname, item.href)
-                    ? "underline decoration-[#B58A5A] decoration-2 underline-offset-[10px]"
+                    ? `after:absolute after:right-0 after:left-0 after:-bottom-3 after:h-0.5 ${activeRule}`
                     : ""
                 }`}
               >
@@ -73,15 +85,17 @@ export default function Header() {
 
           <button
             type="button"
-            className="relative z-10 ml-auto grid h-12 w-12 place-items-center bg-[#B58A5A] text-white"
+            className={`relative z-10 ml-auto grid h-12 w-12 place-items-center ${
+              overHero ? "bg-white text-black" : "bg-[#B58A5A] text-white"
+            }`}
             aria-expanded={open}
             aria-label={open ? "Menüyü kapat" : "Menüyü aç"}
             onClick={() => setOpen((value) => !value)}
           >
             <span className="flex w-6 flex-col gap-1.5">
-              <span className={`h-px w-full bg-white transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`} />
-              <span className={`h-px w-full bg-white transition ${open ? "opacity-0" : ""}`} />
-              <span className={`h-px w-full bg-white transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`} />
+              <span className={`h-px w-full bg-current transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`} />
+              <span className={`h-px w-full bg-current transition ${open ? "opacity-0" : ""}`} />
+              <span className={`h-px w-full bg-current transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`} />
             </span>
           </button>
         </div>
@@ -117,7 +131,7 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
-                  className={`text-4xl ${isActive(pathname, item.href) ? "text-gold" : ""}`}
+                  className={`text-4xl ${isActive(pathname, item.href) ? "text-gold underline decoration-2 underline-offset-8" : ""}`}
                   onClick={() => setOpen(false)}
                 >
                   <HoverText text={item.label} />

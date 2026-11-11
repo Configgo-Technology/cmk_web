@@ -29,11 +29,13 @@ export default function Preloader() {
       <Image
         src="/images/logo-gold.png"
         alt=""
-        width={56}
-        height={48}
+        width={237}
+        height={96}
         className="preloader-logo h-16 w-auto"
         style={{ width: "auto", height: "4rem" }}
         priority
+        sizes="128px"
+        quality={100}
       />
     </div>
   );

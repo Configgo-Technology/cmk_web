@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { subjects } from "@/data/site";
+import { leadProjects } from "@/data/site";
 
 declare global {
   interface Window {
@@ -39,7 +40,7 @@ export default function ContactForm({
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (closed) return;
+    if (closed || pending) return;
 
     const form = new FormData(event.currentTarget);
     const recaptchaToken = siteKey ? window.grecaptcha?.getResponse() ?? "" : "";
@@ -54,12 +55,12 @@ export default function ContactForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.get("name"),
+          fullName: form.get("fullName"),
           email: form.get("email"),
           phone: form.get("phone"),
-          subject: form.get("subject"),
-          message: form.get("message"),
-          privacy: form.get("privacy") === "on",
+          project: form.get("project"),
+          kvkkConsent: form.get("kvkkConsent") === "on",
+          commercialConsent: form.get("commercialConsent") === "on",
           recaptchaToken,
         }),
       });
@@ -80,33 +81,75 @@ export default function ContactForm({
   }
 
   if (done) {
-    return <p className="bg-white px-4 py-6 text-sm text-ink">Mesajınız alındı. En kısa sürede size dönüş yapacağız.</p>;
+    return (
+      <p className="bg-white px-4 py-6 text-sm text-ink">
+        Başvurunuz alındı. En kısa sürede size dönüş yapacağız.
+      </p>
+    );
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
-        <input className={fieldClass} name="name" placeholder="Ad Soyad" autoComplete="name" required maxLength={80} />
-        <input className={fieldClass} name="email" type="email" placeholder="E-posta" autoComplete="email" required maxLength={120} />
-        <input className={fieldClass} name="phone" placeholder="Telefon" autoComplete="tel" required maxLength={20} />
-        <select className={fieldClass} name="subject" defaultValue="" required>
+        <input
+          className={fieldClass}
+          name="fullName"
+          placeholder="Ad Soyad"
+          autoComplete="name"
+          required
+          maxLength={80}
+        />
+        <input
+          className={fieldClass}
+          name="email"
+          type="email"
+          placeholder="E-posta"
+          autoComplete="email"
+          required
+          maxLength={120}
+        />
+        <input
+          className={fieldClass}
+          name="phone"
+          placeholder="Telefon"
+          autoComplete="tel"
+          required
+          maxLength={20}
+        />
+        <select className={fieldClass} name="project" defaultValue="" required>
           <option value="" disabled>
-            Konu Seçiniz
+            Proje Seçiniz
           </option>
-          {subjects.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
+          {leadProjects.map((project) => (
+            <option key={project} value={project}>
+              {project}
             </option>
           ))}
         </select>
       </div>
-      <textarea className={`${fieldClass} min-h-32`} name="message" placeholder="Mesajınız" required minLength={10} maxLength={2000} />
+
       {siteKey ? <div className="g-recaptcha" data-sitekey={siteKey} /> : null}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <label className="flex items-start gap-2 text-sm text-muted">
-          <input name="privacy" type="checkbox" className="mt-1" required />
-          Gizlilik ve Kullanım Koşullarını kabul ediyorum.
-        </label>
+
+      <label className="flex items-start gap-2 text-sm text-muted">
+        <input name="kvkkConsent" type="checkbox" className="mt-1" required />
+        <span>
+          <Link href="/kvkk" className="underline decoration-gold underline-offset-2 hover:text-gold">
+            Aydınlatma Metni
+          </Link>
+          {" "}ve{" "}
+          <Link href="/acik-riza" className="underline decoration-gold underline-offset-2 hover:text-gold">
+            Açık Rıza Metni
+          </Link>
+          &apos;ni okudum, onaylıyorum.
+        </span>
+      </label>
+
+      <label className="flex items-start gap-2 text-sm text-muted">
+        <input name="commercialConsent" type="checkbox" className="mt-1" />
+        <span>Ticari elektronik ileti almak istiyorum.</span>
+      </label>
+
+      <div className="flex justify-end">
         <button
           type="submit"
           disabled={pending || closed}

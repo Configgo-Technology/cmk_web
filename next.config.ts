@@ -8,14 +8,23 @@ const contentSecurityPolicy = [
   "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.google.com https://*.googleapis.com https://*.ggpht.com",
-  "font-src 'self'",
-  "connect-src 'self' https://www.google.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://www.google.com https://api.configgo.com",
   "frame-src https://www.google.com https://maps.google.com",
 ].join("; ");
 
 const nextConfig: NextConfig = {
   async headers() {
     return [
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
       {
         source: "/:path*",
         headers: [
