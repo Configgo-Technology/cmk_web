@@ -14,13 +14,44 @@ const geist = Geist({
   variable: "--font-geist",
 });
 
+const siteUrl = "https://www.cmk.com.tr";
+const siteName = "CMK Holding";
+const description = "Sadece yapı değil, değer inşa ediyoruz.";
+const ogImage = {
+  url: "/open_graph.jpeg",
+  width: 2848,
+  height: 1504,
+  alt: "CMK Holding — Sadece yapı değil, değer inşa ediyoruz.",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "CMK Holding",
+    default: siteName,
     template: "%s | CMK Holding",
   },
-  description:
-    "CMK Holding, inşaat, restorasyon, enerji ve otomotiv alanlarında insan odaklı ve kalıcı değerler üretir.",
+  description,
+  applicationName: siteName,
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName,
+    title: {
+      default: siteName,
+      template: "%s | CMK Holding",
+    },
+    description,
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: {
+      default: siteName,
+      template: "%s | CMK Holding",
+    },
+    description,
+    images: [ogImage.url],
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
