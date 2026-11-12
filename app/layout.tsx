@@ -16,13 +16,13 @@ const geist = Geist({
 
 const siteUrl = "https://www.cmk.com.tr";
 const siteName = "CMK Holding";
-const description = "Sadece yapı değil, değer inşa ediyoruz.";
+const description =
+  "CMK Holding, inşaat, restorasyon, enerji ve otomotiv alanlarında insan odaklı ve kalıcı değerler üretir.";
 const ogImage = {
-  url: "/og.jpg",
+  url: "/og.png",
   width: 1200,
-  height: 633,
-  alt: "CMK Holding — Sadece yapı değil, değer inşa ediyoruz.",
-  type: "image/jpeg",
+  height: 600,
+  alt: "CMK Holding — Geleceği Birlikte İnşa Ediyoruz.",
 };
 
 export const metadata: Metadata = {
