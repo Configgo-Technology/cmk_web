@@ -18,10 +18,11 @@ const siteUrl = "https://www.cmk.com.tr";
 const siteName = "CMK Holding";
 const description = "Sadece yapı değil, değer inşa ediyoruz.";
 const ogImage = {
-  url: "/open_graph.jpeg",
-  width: 2848,
-  height: 1504,
+  url: "/og.jpg",
+  width: 1200,
+  height: 633,
   alt: "CMK Holding — Sadece yapı değil, değer inşa ediyoruz.",
+  type: "image/jpeg",
 };
 
 export const metadata: Metadata = {
