@@ -4,6 +4,7 @@ import HeroStage from "@/components/HeroStage";
 import Marquee from "@/components/Marquee";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
+import SectorSlider from "@/components/SectorSlider";
 import { getProject, homePreviewSlugs } from "@/data/projects";
 import { aboutCopy, brands, corporateHero } from "@/data/site";
 
@@ -52,13 +53,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="mx-auto max-w-[1440px] px-5 pb-10 md:px-[70px]">
-            <Image
-              src="/images/about-buildings.jpg"
-              alt="CMK konut blokları"
-              width={1300}
-              height={426}
-              className="h-auto w-full object-cover"
-            />
+            <SectorSlider />
           </div>
         </section>
       </Reveal>

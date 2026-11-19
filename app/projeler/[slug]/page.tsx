@@ -95,8 +95,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
       />
 
       <Reveal>
-        <section className="bg-white">
-          <div className="mx-auto max-w-[1440px] px-5 py-16 md:px-[70px]">
+        <section className="overflow-x-clip bg-white">
+          <div className="mx-auto max-w-[1440px] overflow-x-clip px-5 py-16 md:px-[70px]">
             <div className="flex items-center gap-4">
               <p className="text-base leading-none text-muted">{project.sectionLabel}</p>
               <span className="h-px w-14 bg-gold" />
@@ -106,18 +106,20 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               <span className="block text-gold">detaylar.</span>
             </h2>
 
-            <div className="mt-10 border border-line bg-white">
-              <div className="grid lg:grid-cols-[859fr_441fr]">
-                <Image
-                  src={`/images/projects/${slug}/2.jpg`}
-                  alt={project.name}
-                  width={859}
-                  height={483}
-                  className="h-full min-h-[280px] w-full object-cover"
-                />
-                <div className="flex flex-col justify-center gap-10 px-8 py-10">
+            <div className="mt-10 overflow-hidden border border-line bg-white">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,859fr)_minmax(0,441fr)]">
+                <div className="relative min-h-[240px] w-full min-w-0 max-w-full overflow-hidden lg:min-h-[280px]">
+                  <Image
+                    src={`/images/projects/${slug}/2.jpg`}
+                    alt={project.name}
+                    fill
+                    sizes="(min-width: 1024px) 860px, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-col justify-center gap-10 px-8 py-10">
                   {facts.map(([label, value], index) => (
-                    <div key={label} className="flex items-start gap-4">
+                    <div key={label} className="flex min-w-0 items-start gap-4">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={FACT_ICONS[index] ?? FACT_ICONS[0]}
@@ -126,9 +128,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
                         height={48}
                         className="h-12 w-12 shrink-0"
                       />
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-base leading-none text-muted">{label}</p>
-                        <p className="mt-2 text-2xl leading-none font-medium text-ink">
+                        <p className="mt-2 break-words text-2xl leading-none font-medium text-ink">
                           {label === "PROJE WEBSİTESİ" && project.website ? (
                             <a href={project.website} className="hover:text-gold" rel="noreferrer" target="_blank">
                               {value}
@@ -152,7 +154,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
           <div className="mx-auto max-w-[1440px] px-5 pb-16 md:px-[70px]">
             <h3 className="font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
               {project.brandLine ?? "ASGARDIA"}
-              <span className="mt-1 block text-gold">{project.headline}</span>
+              {project.headline ? <span className="mt-1 block text-gold">{project.headline}</span> : null}
             </h3>
             <div className="mt-6 max-w-[1299px] space-y-4 text-base leading-6 text-muted">
               {project.paragraphs.map((paragraph) => (
@@ -297,7 +299,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               <span className="block text-gold">Konumu</span>
             </h2>
             <p className="mt-4 max-w-sm text-base leading-6 text-muted">
-              {project.name}, Ankara&apos;da konforlu ve ulaşımı kolay bir lokasyonda yer almaktadır.
+              {project.slug === "diyarbakir-surlari"
+                ? `${project.name}, Diyarbakır’da tarihî kent dokusu içinde yer almaktadır.`
+                : `${project.name}, Ankara’da konforlu ve ulaşımı kolay bir lokasyonda yer almaktadır.`}
             </p>
           </div>
           {project.mapQuery ? (

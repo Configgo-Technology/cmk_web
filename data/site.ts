@@ -7,14 +7,14 @@ export const nav = [
 
 export const contact = {
   addressLines: [
-    "Aydınlıkevler, Uzayan Sk. No:169/1,",
-    "06130 Altındağ/Ankara",
+    "Aydınlıkevler Mahallesi Turgut Özal Bulvarı No:169/1",
+    "(Samsun Yolu) Altındağ/Ankara",
   ],
   phone: "444 3 265",
   phoneHref: "tel:4443265",
   email: "info@cmk.com.tr",
   hours: ["Pzt. Cum. 09:00 - 18:00", "Cmt. 09:00-16:00"],
-  mapQuery: "Aydınlıkevler, Uzayan Sk. No:169/1, 06130 Altındağ/Ankara",
+  mapQuery: "Aydınlıkevler Mahallesi Turgut Özal Bulvarı No:169/1 (Samsun Yolu) Altındağ/Ankara",
 };
 
 /** CRM `project` alanı — PDF başlıklarıyla aynı yazım */
@@ -64,6 +64,13 @@ export const processSteps = [
     title: "Oluşum ve Teslimat",
     text: "İşe başlayıp en kısa sürede sonuçlandırarak teslim ediyoruz.",
   },
+] as const;
+
+export const sectorSlides = [
+  { src: "/images/sectors/insaat.jpg", label: "İnşaat" },
+  { src: "/images/sectors/restorasyon.jpg", label: "Restorasyon" },
+  { src: "/images/sectors/enerji.jpg", label: "Enerji" },
+  { src: "/images/sectors/otomotiv.jpg", label: "Otomotiv" },
 ] as const;
 
 export const brands = [
