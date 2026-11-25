@@ -2,19 +2,17 @@ import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import ProjectListing from "@/components/ProjectListing";
 import Reveal from "@/components/Reveal";
-import { getProject, listingSlugs } from "@/data/projects";
+import { getListingProjects } from "@/data/projects";
 
 export const metadata: Metadata = { title: "Projeler" };
 
-const cards = listingSlugs
-  .map((slug) => getProject(slug))
-  .filter((project): project is NonNullable<typeof project> => Boolean(project));
+const cards = getListingProjects();
 
 export default function ProjectsPage() {
   return (
     <main>
       <PageHero
-        image="/images/hero-pages.jpg"
+        image="/images/projeler-2.webp"
         crumbs={[
           { href: "/", label: "Anasayfa" },
           { label: "Projeler" },

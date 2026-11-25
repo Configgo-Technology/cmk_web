@@ -73,12 +73,32 @@ export const sectorSlides = [
   { src: "/images/sectors/otomotiv.jpg", label: "Otomotiv" },
 ] as const;
 
-export const brands = [
+export type Brand = {
+  src: string;
+  alt: string;
+  /** Etkileşimli referans detay sayfasına bağlanacak slug (örn. "asgardia-motors") */
+  slug?: string;
+  /** Özel/harici bağlantı gerekirse; tanımlı değilse `slug` üzerinden `/projeler/${slug}` üretilir */
+  href?: string;
+};
+
+export const brands: readonly Brand[] = [
   { src: "/images/brand-restorasyon.png", alt: "CMK Restorasyon" },
   { src: "/images/brand-asgardia.png", alt: "Asgardia" },
-  { src: "/images/brand-motors.png", alt: "Asgardia Motors" },
+  { src: "/images/brand-motors.png", alt: "Asgardia Motors", slug: "asgardia-motors" },
   { src: "/images/brand-barok.png", alt: "Barok Enerji" },
-] as const;
+  { src: "/images/brand-restorasyon.png", alt: "Fod Danışmanlık" },
+  { src: "/images/brand-asgardia.png", alt: "Spectre" },
+];
+
+/** Referanslar bölümünden detay sayfasına açılan etkileşimli marka slug'ları */
+export const interactiveBrandSlugs: ReadonlySet<string> = new Set(
+  brands.map((brand) => brand.slug).filter((slug): slug is string => Boolean(slug)),
+);
+
+export function brandHref(brand: Brand): string | undefined {
+  return brand.href ?? (brand.slug ? `/projeler/${brand.slug}` : undefined);
+}
 
 export const homeAbout = {
   eyebrow: "HAKKIMIZDA",
@@ -114,6 +134,25 @@ export const homeHero = {
 export const corporateHero = {
   lines: ["Geçmişten güç alır,", "geleceğe değer katarız."] as const,
   text: "CMK Holding, farklı sektörlerdeki yatırımları ve sürdürülebilir projeleriyle, insan odaklı, modern ve kalıcı değerler üretir.",
+} as const;
+
+export const missionVision = {
+  eyebrow: "KURUMSAL YAKLAŞIM",
+  title: "Geçmişe saygı,",
+  accent: "geleceğe kalıcı değer.",
+  pillars: ["Kalite", "Güven", "Sürdürülebilirlik"] as const,
+  items: [
+    {
+      code: "01",
+      title: "VİZYON",
+      text: "Deneyim ve birikimimizi, ülke ekonomisine değer katacak farklı sektörlerdeki iş fikirleriyle güçlendirmek; faaliyet gösterdiğimiz her alanda kalite, güven ve sürdürülebilirliği ön planda tutmaktır. Tarihi ve kültürel mirasın korunmasından modern projelerin inşasına kadar geniş bir alanda, toplumsal fayda sağlayan, estetik ve mühendisliği birleştiren çalışmalara imza atarak sektörün öncü ve güvenilir markalarından biri olarak CMK markasını, nesiller boyu kalıcı kılmaktır.",
+    },
+    {
+      code: "02",
+      title: "MİSYON",
+      text: "Tarihi ve kültürel mirasımızı koruyarak gelecek nesillere aktarmak, modern kent yaşamına katkı sağlayacak projeler geliştirmek için kalite, güven ve sürdürülebilirliği işimizin özü olarak kabul ederiz. Restorasyon, inşaat, enerji ve otomotiv gibi çok disiplinli alanlarda uzmanlığımızla, hem toplumsal hem de çevresel sorumluluklarımızın bilinciyle, estetik ve işlevselliği bir araya getiren kalıcı çözümler üretmeyi hedefleriz.",
+    },
+  ],
 } as const;
 
 export const sharedVideo = {

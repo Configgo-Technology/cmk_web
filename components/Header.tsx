@@ -48,15 +48,37 @@ export default function Header() {
 
   return (
     <>
-      <header className={`fixed inset-x-0 top-0 z-50 h-[120px] md:h-[140px] ${solid ? "bg-[#F3F5F7]" : "bg-transparent"}`}>
+      <header
+        className={`fixed inset-x-0 top-0 z-50 h-[120px] border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:h-[140px] ${
+          solid
+            ? "border-line/70 bg-[#F3F5F7]/95 shadow-[0_6px_24px_rgba(23,36,58,0.06)] backdrop-blur-md"
+            : "border-transparent bg-transparent"
+        }`}
+      >
         <div className="mx-auto flex h-full max-w-[1440px] items-center px-5 md:px-16">
-          <Link href="/" className="relative z-10 block shrink-0">
+          <Link href="/" className="relative z-10 block h-12 shrink-0">
             <Image
-              src={overHero ? "/images/logo-gold.png" : "/images/logo-dark.png"}
+              src="/images/logo-dark.png"
               alt="CMK Holding"
               width={237}
               height={96}
-              className="h-12 w-auto"
+              className={`h-12 w-auto transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                overHero ? "opacity-0" : "opacity-100"
+              }`}
+              style={{ width: "auto", height: "48px" }}
+              priority
+              sizes="118px"
+              quality={100}
+            />
+            <Image
+              src="/images/logo-gold.png"
+              alt=""
+              aria-hidden
+              width={237}
+              height={96}
+              className={`pointer-events-none absolute inset-0 h-12 w-auto transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                overHero ? "opacity-100" : "opacity-0"
+              }`}
               style={{ width: "auto", height: "48px" }}
               priority
               sizes="118px"
@@ -72,9 +94,9 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative text-base font-normal leading-6 ${linkColor} ${
+                className={`relative text-base font-normal leading-6 transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${linkColor} ${
                   isActive(pathname, item.href)
-                    ? `after:absolute after:right-0 after:left-0 after:-bottom-3 after:h-0.5 ${activeRule}`
+                    ? `after:absolute after:right-0 after:left-0 after:-bottom-3 after:h-0.5 after:transition-colors after:duration-500 after:ease-[cubic-bezier(0.22,1,0.36,1)] ${activeRule}`
                     : ""
                 }`}
               >
@@ -85,7 +107,7 @@ export default function Header() {
 
           <button
             type="button"
-            className={`relative z-10 ml-auto grid h-12 w-12 place-items-center ${
+            className={`relative z-10 ml-auto grid h-12 w-12 place-items-center transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               overHero ? "bg-white text-black" : "bg-[#B58A5A] text-white"
             }`}
             aria-expanded={open}

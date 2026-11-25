@@ -16,7 +16,7 @@ export default function ContactPage() {
   return (
     <main>
       <PageHero
-        image="/images/hero-pages.jpg"
+        image="/images/iletisim-2.webp"
         crumbs={[
           { href: "/", label: "Anasayfa" },
           { label: "İletişim" },

@@ -1,16 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
+import BrandsBand from "@/components/BrandsBand";
 import HeroStage from "@/components/HeroStage";
 import Marquee from "@/components/Marquee";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import SectorSlider from "@/components/SectorSlider";
-import { getProject, homePreviewSlugs } from "@/data/projects";
-import { aboutCopy, brands, homeHero } from "@/data/site";
+import { getHomePreviewProjects } from "@/data/projects";
+import { aboutCopy, homeHero } from "@/data/site";
 
-const preview = homePreviewSlugs
-  .map((slug) => getProject(slug))
-  .filter((project): project is NonNullable<typeof project> => Boolean(project));
+const preview = getHomePreviewProjects();
 
 export default function HomePage() {
   return (
@@ -92,33 +90,7 @@ export default function HomePage() {
         </section>
       </Reveal>
 
-      <Reveal>
-        <section className="bg-white">
-          <div className="mx-auto max-w-[1440px] px-5 py-16 md:px-[70px]">
-            <div className="flex items-center gap-4">
-              <p className="text-base leading-none text-muted">REFERANSLARIMIZ</p>
-              <span className="h-px w-14 bg-gold" />
-            </div>
-            <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
-              Daha iyi yaşam alanları
-              <span className="block text-gold">Markalarımız</span>
-            </h2>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {brands.map((brand) => (
-                <div key={brand.alt} className="grid h-[164px] place-items-center border border-line bg-white px-4">
-                  <Image
-                    src={brand.src}
-                    alt={brand.alt}
-                    width={290}
-                    height={120}
-                    className="max-h-[120px] w-auto max-w-full object-contain"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </Reveal>
+      <BrandsBand />
 
     </main>
   );

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
 import { getProject, projectGallery, projects } from "@/data/projects";
+import { interactiveBrandSlugs } from "@/data/site";
 
 function projectAsset(slug: string, file: string, fallback: string) {
   const full = path.join(process.cwd(), "public", "images", "projects", slug, file);
@@ -17,9 +18,57 @@ function youtubeEmbed(url: string) {
   return match ? `https://www.youtube.com/embed/${match[1]}` : url;
 }
 
-function mapEmbed(name: string, query: string, point?: [number, number]) {
-  const q = point ? `${name}@${point[0]},${point[1]}` : query;
-  return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=16&hl=tr&output=embed`;
+function extractPlaceCid(url: string): string | null {
+  const match = url.match(/!1s0x[0-9a-fA-F]+:0x([0-9a-fA-F]+)/);
+  return match ? BigInt(`0x${match[1]}`).toString() : null;
+}
+
+function extractCoords(url: string): [number, number] | null {
+  const pinMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  if (pinMatch) return [Number(pinMatch[1]), Number(pinMatch[2])];
+  const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (atMatch) return [Number(atMatch[1]), Number(atMatch[2])];
+  const searchMatch = url.match(/\/(?:search|place)\/(-?\d+\.\d+),(?:\+|%20|\s)*(-?\d+\.\d+)/);
+  if (searchMatch) return [Number(searchMatch[1]), Number(searchMatch[2])];
+  return null;
+}
+
+async function resolveMapEmbed(query: string, point?: [number, number] | string) {
+  if (Array.isArray(point)) {
+    const q = `${point[0]},${point[1]}`;
+    return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=16&hl=tr&output=embed`;
+  }
+
+  if (typeof point === "string" && point.trim()) {
+    const raw = point.trim();
+    if (raw.includes("output=embed") || raw.includes("/maps/embed")) {
+      return raw;
+    }
+
+    let resolvedUrl = raw;
+    if (!extractPlaceCid(resolvedUrl) && !extractCoords(resolvedUrl) && /^https?:\/\//.test(resolvedUrl)) {
+      try {
+        const res = await fetch(resolvedUrl, { method: "HEAD", redirect: "manual" });
+        const location = res.headers.get("location");
+        if (location) resolvedUrl = location;
+      } catch {
+        // Fallback to mapQuery below if short link cannot be resolved
+      }
+    }
+
+    const cid = extractPlaceCid(resolvedUrl);
+    if (cid) {
+      return `https://maps.google.com/maps?cid=${cid}&z=16&hl=tr&output=embed`;
+    }
+
+    const coords = extractCoords(resolvedUrl);
+    if (coords) {
+      const q = `${coords[0]},${coords[1]}`;
+      return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=16&hl=tr&output=embed`;
+    }
+  }
+
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=16&hl=tr&output=embed`;
 }
 
 type Params = { slug: string };
@@ -71,8 +120,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   });
   const socialImage = projectAsset(slug, "7.jpg", gallery[2] ?? gallery[0]);
   const technicalImage = projectAsset(slug, "8.jpg", gallery[3] ?? gallery[0]);
-  const videoImage = projectAsset(slug, "9.jpg", gallery[4] ?? gallery[0]);
   const mapImage = projectAsset(slug, "10.jpg", "/images/map-altindag.jpg");
+  const videoUrl = project.videoUrl?.trim();
+  const mapEmbedUrl =
+    project.mapQuery || project.mapPoint
+      ? await resolveMapEmbed(project.mapQuery ?? project.name, project.mapPoint)
+      : null;
+
+  const isInteractiveBrand = interactiveBrandSlugs.has(project.slug);
 
   const facts = [
     ["PROJE KATEGORİSİ", project.categoryLabel ?? project.category],
@@ -85,11 +140,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
     <main>
       <PageHero
         image={`/images/projects/${slug}/1.jpg`}
-        crumbs={[
-          { href: "/", label: "Anasayfa" },
-          { href: "/projeler", label: "Projeler" },
-          { label: project.name },
-        ]}
+        crumbs={
+          isInteractiveBrand
+            ? [{ href: "/", label: "Anasayfa" }, { label: project.name }]
+            : [
+                { href: "/", label: "Anasayfa" },
+                { href: "/projeler", label: "Projeler" },
+                { label: project.name },
+              ]
+        }
         lines={project.titleLines}
         wash="navy"
       />
@@ -102,8 +161,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               <span className="h-px w-14 bg-gold" />
             </div>
             <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
-              Proje hakkında
-              <span className="block text-gold">detaylar.</span>
+              {isInteractiveBrand ? "Marka" : "Proje"}
+              <span className="text-gold"> Künyesi.</span>
             </h2>
 
             <div className="mt-10 overflow-hidden border border-line bg-white">
@@ -189,7 +248,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               project.showSocialImage || project.socialItems.length > 0 ? "md:grid-cols-2 md:items-stretch" : ""
             }`}
           >
-            <div>
+            <div className="flex flex-col">
               {project.socialTitle ? (
                 <h2 className="font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
                   {project.socialTitle}
@@ -205,22 +264,36 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
                     </p>
                   ))
                 : null}
-              <ChipGrid items={project.socialItems} />
+              {project.socialItems.length > 0 ? (
+                <div className="mt-auto">
+                  <ChipGrid items={project.socialItems} />
+                </div>
+              ) : null}
             </div>
             {project.showSocialImage || project.socialItems.length > 0 ? (
-              <Image
-                src={socialImage}
-                alt=""
-                width={900}
-                height={640}
-                className={
-                  project.socialImageSquare
-                    ? "aspect-square h-auto w-full self-center object-cover"
-                    : project.showSocialImage && project.socialItems.length === 0
-                      ? "aspect-video h-auto w-full self-center object-cover"
-                      : "h-80 w-full object-cover"
-                }
-              />
+              project.socialImageSquare || (project.showSocialImage && project.socialItems.length === 0) ? (
+                <Image
+                  src={socialImage}
+                  alt=""
+                  width={900}
+                  height={640}
+                  className={
+                    project.socialImageSquare
+                      ? "aspect-square h-auto w-full self-center object-cover"
+                      : "aspect-video h-auto w-full self-center object-cover"
+                  }
+                />
+              ) : (
+                <div className="relative min-h-[280px] w-full overflow-hidden md:h-full">
+                  <Image
+                    src={socialImage}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              )
             ) : null}
           </div>
         </section>
@@ -228,15 +301,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
 
       {(project.technicalItems.length > 0 || (project.technicalText && project.technicalTitle)) && (
         <section className="bg-white">
-          <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:grid-cols-2 md:px-[70px]">
-            <Image
-              src={technicalImage}
-              alt=""
-              width={900}
-              height={640}
-              className="h-80 w-full object-cover"
-            />
-            <div>
+          <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-12 md:grid-cols-2 md:items-stretch md:px-[70px]">
+            <div className="relative min-h-[280px] w-full overflow-hidden md:h-full">
+              <Image
+                src={technicalImage}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col">
               <h2 className="font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
                 {project.technicalTitle}
                 {project.technicalAccent ? (
@@ -246,13 +321,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               {project.technicalText ? (
                 <p className="mt-4 max-w-xl text-base leading-6 text-muted">{project.technicalText}</p>
               ) : null}
-              <ChipGrid items={project.technicalItems} />
+              {project.technicalItems.length > 0 ? (
+                <div className="mt-auto">
+                  <ChipGrid items={project.technicalItems} />
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
       )}
 
-      {project.videoUrl || project.showVideo !== false ? (
+      {videoUrl && project.showVideo !== false ? (
         <section className="bg-white">
           <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-12 md:grid-cols-2 md:px-[70px]">
             <div>
@@ -269,20 +348,16 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
                 keşfedin.
               </p>
             </div>
-            {project.videoUrl ? (
-              <div className="aspect-video w-full overflow-hidden bg-[#0B0D10]">
-                <iframe
-                  src={youtubeEmbed(project.videoUrl)}
-                  title={`${project.name} tanıtım videosu`}
-                  className="h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
-            ) : (
-              <Image src={videoImage} alt="" width={1000} height={640} className="h-72 w-full object-cover" />
-            )}
+            <div className="aspect-video w-full overflow-hidden bg-[#0B0D10]">
+              <iframe
+                src={youtubeEmbed(videoUrl)}
+                title={`${project.name} tanıtım videosu`}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
           </div>
         </section>
       ) : null}
@@ -295,8 +370,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
               <span className="h-px w-14 bg-gold" />
             </div>
             <h2 className="mt-4 font-geist text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
-              Proje
-              <span className="block text-gold">Konumu</span>
+              {isInteractiveBrand ? (
+                <span className="text-gold">Konum</span>
+              ) : (
+                <>
+                  Proje
+                  <span className="block text-gold">Konumu</span>
+                </>
+              )}
             </h2>
             <p className="mt-4 max-w-sm text-base leading-6 text-muted">
               {project.slug === "diyarbakir-surlari"
@@ -304,16 +385,22 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
                 : `${project.name}, Ankara’da konforlu ve ulaşımı kolay bir lokasyonda yer almaktadır.`}
             </p>
           </div>
-          {project.mapQuery ? (
+          {mapEmbedUrl ? (
             <iframe
               title={`${project.name} konumu`}
-              src={mapEmbed(project.name, project.mapQuery, project.mapPoint)}
+              src={mapEmbedUrl}
               className="aspect-video h-auto w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
           ) : (
-            <Image src={mapImage} alt="Proje konumu" width={1000} height={640} className="h-72 w-full object-cover" />
+            <Image
+              src={mapImage}
+              alt={isInteractiveBrand ? "Konum" : "Proje konumu"}
+              width={1000}
+              height={640}
+              className="h-72 w-full object-cover"
+            />
           )}
         </div>
       </section>

@@ -34,7 +34,7 @@ export default function HeroStage({
   }, []);
 
   return (
-    <div ref={track} className="relative h-[190vh]">
+    <div ref={track} className="relative h-[120vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         <Image
           src={image}
@@ -43,10 +43,10 @@ export default function HeroStage({
           priority
           sizes="100vw"
           quality={90}
-          className="object-cover"
+          className="object-cover will-change-transform"
           style={{
             objectPosition,
-            transform: `scale(${1 + progress * 0.12})`,
+            transform: `scale(${1 + progress * 0.1})`,
           }}
         />
         {/* Soft left wash so white type stays readable without muddying the building */}

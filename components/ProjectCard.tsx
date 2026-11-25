@@ -9,11 +9,7 @@ export default function ProjectCard({ project }: { project: Project }) {
   const coverClass = "h-52 w-full object-cover";
 
   return (
-    <article
-      className="border border-line bg-white"
-      data-cursor="İNCELE"
-      data-preview={`/images/projects/${project.slug}/1.jpg`}
-    >
+    <article className="border border-line bg-white">
       {project.hasDetail ? (
         <Link href={href} className="block h-52 overflow-hidden">
           <Image

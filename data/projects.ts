@@ -55,13 +55,23 @@ export type Project = {
   showVideo?: boolean;
   videoUrl?: string;
   mapQuery?: string;
-  mapPoint?: [number, number];
+  mapPoint?: [number, number] | string;
   showMidGallery?: boolean;
   showSocialImage?: boolean;
   socialImageSquare?: boolean;
   excerpt: string;
 };
 
+/**
+ * Proje görselleri `public/images/projects/<slug>/` klasöründen numara kuralıyla okunur:
+ * - 1.jpg     : Hero ve proje kartı kapak görseli
+ * - 2.jpg     : "Proje hakkında detaylar" görseli
+ * - 3-6.jpg   : Orta 4'lü galeri görselleri
+ * - 7.jpg     : Sosyal alanlar görseli
+ * - 8.jpg     : Teknik donatılar görseli
+ * - 9.jpg     : Video fallback görseli
+ * - 10.jpg    : Harita fallback görseli
+ */
 const photo = (slug: string, index: number) => `/images/projects/${slug}/${index}.jpg`;
 
 export const projects: Project[] = [
@@ -111,7 +121,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Kent Rose",
     videoUrl: "https://youtu.be/dDEfNgoZCzk",
     mapQuery: "Asgardia Kent Rose, Altındağ, Ankara",
-    mapPoint: [39.9630673, 32.8890889],
+    mapPoint: "https://maps.app.goo.gl/XDb9A6ovXUs4Qgvi9",
     hasDetail: true,
     excerpt:
       "Asgardia Kent Rose, Altındağ Aydınlıkevler Mahallesi’nde geniş peyzaj alanını yaşamın merkezine yerleştiriyor. 150.000 m² toplam proje alanı üzerinde yükselen proje; 20.000 m²",
@@ -161,7 +171,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Kent Lotus",
     videoUrl: "https://youtu.be/h7moEsbytcQ",
     mapQuery: "Asgardia Kent Lotus, Altındağ, Ankara",
-    mapPoint: [39.9606084, 32.8860964],
+    mapPoint: "https://maps.app.goo.gl/hU9dZsJBg91zZxFg6",
     hasDetail: true,
     excerpt: "Asgardia Kent Lotus, Aydınlıkevler’de Altınpark’ın hemen yanındaki konumunu avantajlı metrekare fiyatıyla buluşturarak hem yaşam hem yatırım için güçlü bir seçenek sunuyor.",
   },
@@ -185,8 +195,8 @@ export const projects: Project[] = [
     ],
     highlights: [
       "4 Blok",
-      "1+1 & 2+1 Daireler",
-      "2 Katlı",
+      "1+1 & 2+1 Ofis ve Daireler",
+      "2 katlı Açık Avm",
       "Açık AVM Konsepti",
     ],
     socialTitle: "Sosyal Donatılar",
@@ -212,7 +222,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Meydan",
     videoUrl: "https://www.youtube.com/watch?v=OEXND58dHAE",
     mapQuery: "Asgardia Meydan, Keçiören, Ankara",
-    mapPoint: [39.9843934, 32.8637948],
+    mapPoint: "https://maps.app.goo.gl/87zJXZqR6Gf2KFKW6",
     hasDetail: true,
     excerpt: "Asgardia markasının vizyonuyla hayata geçirilen Asgardia Meydan, Keçiören’de konut, ofis ve ticari yaşamı bir araya getiren, bölgenin ilk açık AVM konseptli karma yaşam projesidir.",
   },
@@ -263,7 +273,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Lumina",
     videoUrl: "https://youtu.be/8cg696YG7iE",
     mapQuery: "Asgardia Lumina, Yenimahalle, Ankara",
-    mapPoint: [39.9564811, 32.8157755],
+    mapPoint: "https://maps.app.goo.gl/PsYfYhoLqDMvw67z7",
     hasDetail: true,
     excerpt: "Metro yanı başınızda. Şehrin önemli noktaları yakınınızda. Asgardia Lumina, İvedik Metro İstasyonu’nun hemen yanında, yeni adliye binasının karşısında ve Etlik Şehir Hastanesi’ne",
   },
@@ -277,7 +287,7 @@ export const projects: Project[] = [
     website: "https://www.asgardia.com.tr",
     sectionLabel: "ASGARDIA PARK CADDESİ",
     brandLine: "ASGARDIA",
-    headline: "",
+    headline: "Park Caddesi",
     paragraphs: [
       "Sınırlı sayıda konut. Seçkin bir yaşam. Asgardia Park Caddesi, butik ölçeği ve yüksek yaşam standartlarıyla ayrıcalıklı bir konut anlayışı sunuyor.",
       "Asgardia’nın özgün mimari yaklaşımıyla tasarlanan proje; sınırlı sayıda konutu, ferah planlaması ve nitelikli donatılarıyla öne çıkıyor. Fonksiyonel mekânlar, estetik detaylar ve bahçeyle kurulan ilişki, konforu günlük yaşamın doğal bir parçasına dönüştürüyor.",
@@ -313,7 +323,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Park Caddesi",
     videoUrl: "https://youtu.be/LrP1UcjzG48",
     mapQuery: "Park Caddesi Asgardia, Çankaya, Ankara",
-    mapPoint: [39.8632463, 32.6757401],
+    mapPoint: "https://maps.app.goo.gl/bXRpKtss625WfYmE8",
     hasDetail: true,
     excerpt: "Sınırlı sayıda konut. Seçkin bir yaşam. Asgardia Park Caddesi, butik ölçeği ve yüksek yaşam standartlarıyla ayrıcalıklı bir konut anlayışı sunuyor.",
   },
@@ -327,8 +337,8 @@ export const projects: Project[] = [
     company: "CMK HOLDİNG",
     website: "https://www.cmk.com.tr",
     sectionLabel: "NOVA SANAYİ SİTESİ",
-    brandLine: "Nova Sanayi Sitesi",
-    headline: "",
+    brandLine: "Nova",
+    headline: "Sanayi Sitesi",
     paragraphs: [
       "CMK Holding tarafından hayata geçirilen Nova Sanayi Sitesi, modern mimarisi, geniş kullanım alanları ve verimlilik odaklı planlamasıyla üretim & ticaret sektörüne yönelik çağdaş bir sanayi kompleksi olarak tasarlanmıştır.",
       "Toplam 81 bağımsız dükkândan oluşan proje, farklı iş kollarının ihtiyaçlarına yanıt verecek şekilde planlanmıştır.",
@@ -364,7 +374,7 @@ export const projects: Project[] = [
     galleryLabel: "Nova Sanayi Sitesi",
     videoUrl: "https://youtu.be/RO0XSXdprHQ",
     mapQuery: "Nova Sanayi Sitesi, Ankara",
-    mapPoint: [40.0430094, 32.9294682],
+    mapPoint: "https://maps.app.goo.gl/WJEhVpEPXLY1guCW9",
     hasDetail: true,
     excerpt: "CMK Holding tarafından hayata geçirilen Nova Sanayi Sitesi, modern mimarisi, geniş kullanım alanları ve verimlilik odaklı planlamasıyla üretim & ticaret sektörüne yönelik",
   },
@@ -377,7 +387,7 @@ export const projects: Project[] = [
     company: "CMK HOLDING",
     website: "https://www.asgardia.com.tr",
     sectionLabel: "ASGARDIA AYDINLIKEVLER",
-    headline: "Aydınlıkevler Konut Projesi",
+    headline: "Aydınlıkevler Yaşam Projesi",
     paragraphs: [
       "Asgardia markamızın vizyonuyla hayata geçirilen bu özel proje; modern yaşam standartlarını karşılayan, fonksiyonel mimarisi ve güçlü sosyal donatılarıyla öne çıkan bir yaşam alanı olarak tamamlanmıştır.",
       "Toplamda 3 konut bloğu ve bir adet 9.900 m² kapalı alana sahip ticari bloktan oluşan proje kapsamında, 188 konut kullanıcılarına teslim edilmiştir. Daire tipleri, farklı yaşam ihtiyaçlarına yanıt verecek şekilde çeşitlendirilmiştir.",
@@ -414,7 +424,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia Aydınlıkevler",
     videoUrl: "https://youtu.be/MkRji72eVy4",
     mapQuery: "Asgardia Aydınlıkevler Konutları, Altındağ, Ankara",
-    mapPoint: [39.9588645, 32.8889384],
+    mapPoint: "https://maps.app.goo.gl/QuanS9qQEHGS5buR7",
     hasDetail: true,
     excerpt:
       "Asgardia markamızın vizyonuyla hayata geçirilen bu özel proje; modern yaşam standartlarını karşılayan, fonksiyonel mimarisi ve güçlü sosyal donatılarıyla öne çıkan bir yaşam alanı",
@@ -453,7 +463,7 @@ export const projects: Project[] = [
     galleryLabel: "Asgardia MOTORS",
     videoUrl: "https://youtu.be/LcGlDaf-5so",
     mapQuery: "Asgardia Motors, Altındağ, Ankara",
-    mapPoint: [39.9581794, 32.8882039],
+    mapPoint: "https://maps.app.goo.gl/oTu4ZrSo3zZ7E4dR9",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -490,9 +500,9 @@ export const projects: Project[] = [
     technicalItems: [],
     galleryLabel: "Gazi Üniversitesi Rektörlük",
     website: "https://www.cmk.com.tr",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Gazi Üniversitesi Rektörlük Binası, Ankara",
-    mapPoint: [39.9398405, 32.8218605],
+    mapPoint: "https://maps.app.goo.gl/6zbjBy1vk18knYTq8",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -534,9 +544,9 @@ export const projects: Project[] = [
     technicalItems: [],
     galleryLabel: "Anadolu Medeniyetler Müzesi",
     website: "https://www.barokenerji.com",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Anadolu Medeniyetleri Müzesi, Ankara",
-    mapPoint: [39.9382042, 32.8618958],
+    mapPoint: "https://maps.app.goo.gl/xjVt7dnvkZSnRkxZ9",
     showMidGallery: true,
     showSocialImage: true,
     socialImageSquare: true,
@@ -575,7 +585,7 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Tarihi Diyarbakır Surları",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Tarihi Diyarbakır Surları, Diyarbakır",
     mapPoint: [37.9065922, 40.2264236],
     showMidGallery: true,
@@ -615,9 +625,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Eski Maliye Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Eski Maliye Binası, Ulus, Ankara",
-    mapPoint: [39.9425645, 32.8563364],
+    mapPoint: "https://maps.app.goo.gl/bjLQAC6XYHsAN2iq6",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -655,9 +665,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Hazine Müzesi",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Hazine Müzesi, Ulus, Ankara",
-    mapPoint: [39.9431646, 32.8548544],
+    mapPoint: "https://maps.app.goo.gl/CUfEkm4Twpgj6NLM9",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -695,9 +705,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Döner Sermaye Binaları",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Maliye Bakanlığı Döner Sermaye Binaları, Ulus, Ankara",
-    mapPoint: [39.9421651, 32.8532614],
+    mapPoint: "https://maps.app.goo.gl/GMmD1MPAJtfPRzMX6",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -735,9 +745,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Tarihi Sümerbank Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Tarihi Sümerbank Binası, Ulus, Ankara",
-    mapPoint: [39.942335, 32.854948],
+    mapPoint: "https://maps.app.goo.gl/6yfufMv1UvoiNnfv9",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -775,9 +785,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "İlk Başbakanlık Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "İlk Başbakanlık Binası, Ulus, Ankara",
-    mapPoint: [39.943367, 32.855346],
+    mapPoint: "https://maps.app.goo.gl/ReBzFAkeJpB1pNBB7",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -815,9 +825,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Tarihi Defterdarlık Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Tarihi Defterdarlık Binası, Ulus, Ankara",
-    mapPoint: [39.9430619, 32.8566967],
+    mapPoint: "https://maps.app.goo.gl/yyG99iH6QTPuT9fT6",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -855,9 +865,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Yüksek Eğitim Merkez Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Maliye Bakanlığı Yüksek Eğitim Merkez Binası, Ulus, Ankara",
-    mapPoint: [39.9426294, 32.8535949],
+    mapPoint: "https://maps.app.goo.gl/vq8a7viYxRXhzp9o7",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -897,7 +907,7 @@ export const projects: Project[] = [
     galleryLabel: "Akaryakıt İstasyonu",
     videoUrl: "https://youtu.be/_Js-RlveScg",
     mapQuery: "Akaryakıt İstasyonu, Altındağ, Ankara",
-    mapPoint: [39.9597809, 32.9248625],
+    mapPoint: "https://maps.app.goo.gl/DrUVe9iDFJK33w9h6",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -935,9 +945,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Kreş Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Kreş Binası, Altındağ, Ankara",
-    mapPoint: [39.958197, 32.858258],
+    mapPoint: "https://maps.app.goo.gl/mnLCU5g4RTTDQuc49",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -975,9 +985,9 @@ export const projects: Project[] = [
     technicalText: "",
     technicalItems: [],
     galleryLabel: "Kültür Merkezi Binası",
-    videoUrl: "https://youtu.be/69ohkVI0zlg",
+    videoUrl: "",
     mapQuery: "Kültür Merkezi Binası, Altındağ, Ankara",
-    mapPoint: [39.958262, 32.858719],
+    mapPoint: "https://maps.app.goo.gl/5WXVjzWQHAMc4qJ66",
     showMidGallery: true,
     showSocialImage: true,
     hasDetail: true,
@@ -985,43 +995,58 @@ export const projects: Project[] = [
   },
 ];
 
-export const listingSlugs = [
-  // projeler.pdf ilk 9 kart
-  "kent-rose",
-  "kent-lotus",
+/** Anasayfa (ve Kurumsal) PROJELERİMİZ bölümü için ayrı proje sıralaması */
+export const homePreviewSlugs = [
   "meydan",
+  "kent-lotus",
+  "kent-rose",
   "lumina",
   "park-caddesi",
   "nova-sanayi",
-  "anadolu-medeniyetler",
-  "rektorluk",
-  // diğer proje-*.pdf detayları
+] as const;
+
+/** Projeler sayfası (/projeler) için ayrı proje sıralaması */
+export const listingSlugs = [
+  // İlk 6
+  "meydan",
+  "kent-lotus",
+  "kent-rose",
+  "lumina",
+  "park-caddesi",
+  "nova-sanayi",
+  // Devamı
   "aydinlikevler",
-  "asgardia-motors",
+  "akaryakit-istasyonu",
+  "kres",
+  "kultur-merkezi",
+  // Restorasyon projeleri
+  "rektorluk",
   "diyarbakir-surlari",
-  "eski-maliye",
-  "hazine-muzesi",
-  "doner-sermaye",
   "sumerbank",
   "ilk-basbakanlik",
   "defterdarlik",
   "yuksek-egitim",
-  "akaryakit-istasyonu",
-  "kres",
-  "kultur-merkezi",
-] as const;
-
-export const homePreviewSlugs = [
-  "kent-rose",
-  "kent-lotus",
-  "meydan",
-  "lumina",
-  "park-caddesi",
-  "nova-sanayi",
+  // Kalan projeler (Renovasyon)
+  "anadolu-medeniyetler",
+  "eski-maliye",
+  "hazine-muzesi",
+  "doner-sermaye",
 ] as const;
 
 export function getProject(slug: string) {
   return projects.find((project) => project.slug === slug);
+}
+
+export function getHomePreviewProjects(): Project[] {
+  return homePreviewSlugs
+    .map((slug) => getProject(slug))
+    .filter((project): project is Project => Boolean(project));
+}
+
+export function getListingProjects(): Project[] {
+  return listingSlugs
+    .map((slug) => getProject(slug))
+    .filter((project): project is Project => Boolean(project));
 }
 
 export function projectImage(slug: string, index = 1) {
