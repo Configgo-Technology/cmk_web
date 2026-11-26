@@ -7,7 +7,7 @@ import MissionVisionBand from "@/components/MissionVisionBand";
 import ProjectCard from "@/components/ProjectCard";
 import SectorSlider from "@/components/SectorSlider";
 import { getHomePreviewProjects } from "@/data/projects";
-import { aboutCopy, corporateHero } from "@/data/site";
+import { corporateAbout, corporateHero } from "@/data/site";
 
 export const metadata: Metadata = { title: "Kurumsal" };
 
@@ -37,21 +37,34 @@ export default function AboutPage() {
       <Marquee />
 
       <section className="relative z-10 bg-sand">
-        <div className="mx-auto grid max-w-[1440px] items-start gap-10 px-5 py-20 md:grid-cols-2 md:px-[70px]">
+        <div className="mx-auto max-w-[1440px] px-5 py-20 md:px-[70px]">
           <Reveal variant="up">
             <div className="flex items-center gap-4">
-              <p className="text-base leading-none text-muted">{aboutCopy.eyebrow}</p>
+              <p className="text-base leading-none text-muted">{corporateAbout.eyebrow}</p>
               <span className="h-px w-14 bg-gold" />
             </div>
             <h2 className="font-geist mt-4 text-[32px] leading-none tracking-[-0.02em] text-ink md:text-[40px]">
-              {aboutCopy.title}
-              <span className="block text-gold">{aboutCopy.accent}</span>
+              {corporateAbout.title}
+              <span className="block text-gold">{corporateAbout.accent}</span>
             </h2>
           </Reveal>
-          <Reveal variant="up" delay={90} className="space-y-4 text-xl leading-7 text-muted">
-            {aboutCopy.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+
+          <div className="mt-10 grid gap-8 border-t border-line pt-10 md:grid-cols-2 md:gap-14">
+            {corporateAbout.columns.map((column, colIdx) => (
+              <Reveal
+                key={colIdx}
+                variant="up"
+                delay={90 + colIdx * 80}
+                className="space-y-5 text-base leading-7 text-muted md:text-[17px] md:leading-8"
+              >
+                {column.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </Reveal>
             ))}
+          </div>
+
+          <Reveal variant="up" delay={200} className="mt-10 flex items-center gap-4 border-t border-line pt-8">
           </Reveal>
         </div>
         <div className="mx-auto max-w-[1440px] px-5 pb-10 md:px-[70px]">
@@ -85,7 +98,7 @@ export default function AboutPage() {
           </div>
           <div className="mt-10 grid gap-8 md:grid-cols-3">
             {preview.map((project, index) => (
-              <Reveal key={project.slug} variant="up" delay={index * 90}>
+              <Reveal key={project.slug} variant="up" delay={index * 90} className="h-full">
                 <ProjectCard project={project} />
               </Reveal>
             ))}

@@ -10,7 +10,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.google.com https://*.googleapis.com https://*.ggpht.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google.com https://api.configgo.com",
+  "connect-src 'self' https://www.google.com",
   "frame-src https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://recaptcha.google.com/recaptcha/",
 ].join("; ");
 

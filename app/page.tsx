@@ -85,7 +85,7 @@ export default function HomePage() {
           </div>
           <div className="mt-10 grid gap-8 md:grid-cols-3">
             {preview.map((project, index) => (
-              <Reveal key={project.slug} variant="up" delay={index * 90}>
+              <Reveal key={project.slug} variant="up" delay={index * 90} className="h-full">
                 <ProjectCard project={project} />
               </Reveal>
             ))}

@@ -8,7 +8,7 @@ import { getContactFormConfig } from "@/lib/contact";
 import { resolveMapEmbed } from "@/lib/maps";
 
 export const metadata: Metadata = { title: "İletişim" };
-export const revalidate = 86400;
+export const dynamic = "force-dynamic";
 
 export default async function ContactPage() {
   const { enabled, siteKey } = getContactFormConfig();

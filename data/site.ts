@@ -102,6 +102,23 @@ export const aboutCopy = {
   ],
 } as const;
 
+export const corporateAbout = {
+  eyebrow: "CMK HOLDİNG HAKKINDA",
+  title: "Geleceği inşa ederken",
+  accent: "değer üretiyoruz.",
+  columns: [
+    [
+      "CMK HOLDİNG, 2014 yılında kurulmuş olup, sahip olduğu teknik birikim, uzman kadro ve çok sektörlü yapısıyla inşaat, restorasyon, enerji ve otomotiv gibi farklı alanlarda faaliyet göstermektedir. Kuruluşumuzdan bu yana; hem modern şehir yaşamına katkı sağlayan güncel üstyapı projeleri hem de kültürel miras niteliğindeki taşınmaz varlıkların özenli restorasyonu ile sektörde saygın bir yer edindik.",
+      "Bugünü ve yarını daha yaşanır kılma hedefiyle, projelerimizde teknik yeterliliğimizi, kalite odaklı yaklaşımımızı ve kullanıcı beklentilerini temel alıyoruz. Fonksiyonel, sağlam, mimari ve mühendislik kriterlerine uygun, standartların üzerinde yapılar üretirken; çevreyle uyumlu, insan odaklı yaşam ve çalışma alanları yaratmayı esas alıyoruz.",
+    ],
+    [
+      "Taşınmaz kültür varlıklarının yalnızca mimari değil, aynı zamanda toplumsal ve kültürel birer hafıza olduğunun bilinciyle hareket ediyoruz. Bu yapıların, coğrafyamızın tarihsel birikimini taşıyan ve kültürel kimliğimizi yansıtan öğeler olduğunu kabul ederek, bilimsel disiplinlere uygun restorasyon anlayışımızla onları geleceğe kazandırıyoruz. Geçmişin izlerini taşıyan bu yapılarla bugünü buluşturmak, CMK HOLDİNG’in en temel sorumluluk alanlarından biridir.",
+      "Geniş faaliyet alanlarımızla ülke ekonomisine katma değer sağlamayı, kalite ve güven esaslı projeler üretmeyi sürdürüyoruz.",
+    ],
+  ] as const,
+  motto: "Sadece yapı değil, değer inşa ediyoruz.",
+} as const;
+
 export const homeHero = {
   lines: ["Yaşam Alanları", "Geleceği", "Şekillendirir."] as const,
   text: "CMK Holding, farklı sektörlerdeki yatırımları ve sürdürülebilir projeleriyle, insan odaklı, modern ve kalıcı değerler üretir.",

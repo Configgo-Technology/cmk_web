@@ -9,7 +9,6 @@ export type ContactPayload = {
   phone: string;
   project: string;
   kvkkConsent: boolean;
-  commercialConsent: boolean;
   recaptchaToken: string;
 };
 
@@ -22,7 +21,6 @@ export function readContactPayload(body: unknown): ContactPayload | null {
     phone: typeof record.phone === "string" ? record.phone.trim() : "",
     project: typeof record.project === "string" ? record.project.trim() : "",
     kvkkConsent: record.kvkkConsent === true,
-    commercialConsent: record.commercialConsent === true,
     recaptchaToken: typeof record.recaptchaToken === "string" ? record.recaptchaToken : "",
   };
 }
@@ -46,11 +44,9 @@ export function getContactFormConfig() {
   const captchaSecret = process.env.RECAPTCHA_SECRET_KEY?.trim() ?? "";
   const production = process.env.NODE_ENV === "production";
   const hasCaptchaKeys = Boolean(siteKey && captchaSecret);
-  const enabled =
-    Boolean(crmBase) &&
-    (production
-      ? Boolean(webhookSecret) && hasCaptchaKeys
-      : hasCaptchaKeys || (!siteKey && !captchaSecret));
+  const enabled = production
+    ? Boolean(webhookSecret) && hasCaptchaKeys
+    : hasCaptchaKeys || (!siteKey && !captchaSecret);
 
   return { enabled, crmBase, webhookSecret, siteKey, captchaSecret };
 }
@@ -72,23 +68,27 @@ export async function verifyRecaptcha(token: string, secret: string) {
   return data.success === true;
 }
 
-async function postWebLead(url: string, body: string, headers: HeadersInit) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
-  try {
-    return await fetch(url, {
-      method: "POST",
-      headers,
-      body,
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timer);
-  }
+function postWebLead(url: string, body: string, headers: HeadersInit) {
+  return fetch(url, {
+    method: "POST",
+    headers,
+    body,
+    signal: AbortSignal.timeout(10_000),
+  });
 }
 
-/** Canlı CRM: önce `/web-leads`, 404 olursa `/api/web-leads`. */
-export async function forwardWebLead(input: ContactPayload, base: string, secret: string) {
+export type ClientMeta = {
+  ip?: string;
+  userAgent?: string;
+};
+
+/** Canlı CRM: `POST {base}/web-leads` (201 Created + `{ success: true }`). */
+export async function forwardWebLead(
+  input: ContactPayload,
+  base: string,
+  secret: string,
+  clientMeta?: ClientMeta,
+) {
   const payload = JSON.stringify({
     full_name: input.fullName,
     email: input.email,
@@ -103,21 +103,32 @@ export async function forwardWebLead(input: ContactPayload, base: string, secret
   };
   if (secret) headers["X-Webhook-Secret"] = secret;
 
-  const primary = `${base}/web-leads`;
-  let response = await postWebLead(primary, payload, headers);
-
-  if (response.status === 404) {
-    response = await postWebLead(`${base}/api/web-leads`, payload, headers);
+  const ip = clientMeta?.ip?.replace(/[\r\n]+/g, "").trim();
+  if (ip && ip !== "unknown") {
+    headers["X-Forwarded-For"] = ip.slice(0, 80);
   }
+  const userAgent = clientMeta?.userAgent?.replace(/[\r\n]+/g, " ").trim();
+  if (userAgent) {
+    headers["User-Agent"] = userAgent.slice(0, 300);
+  }
+
+  const endpoint = `${base}/web-leads`;
+  let response = await postWebLead(endpoint, payload, headers);
 
   if (response.status >= 500) {
     await new Promise((resolve) => setTimeout(resolve, 400));
-    response = await postWebLead(
-      response.url.includes("/api/web-leads") ? `${base}/api/web-leads` : primary,
-      payload,
-      headers,
-    );
+    response = await postWebLead(endpoint, payload, headers);
   }
 
   return response;
+}
+
+export async function isWebLeadCreated(response: Response): Promise<boolean> {
+  if (response.status !== 201) return false;
+  try {
+    const data = (await response.json()) as { success?: unknown };
+    return data.success === true;
+  } catch {
+    return false;
+  }
 }

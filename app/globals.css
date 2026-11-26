@@ -125,6 +125,15 @@ body {
   }
 }
 
+/* Smooth height transition for filtered project grid */
+.project-listing-stage {
+  transition: height 480ms var(--ease-calm);
+}
+
+.project-listing-stage[data-resizing="true"] {
+  overflow: hidden;
+}
+
 @layer base {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]) {
@@ -422,6 +431,17 @@ html.is-transitioning {
   overflow: hidden;
 }
 
+.site-header {
+  opacity: 1;
+  transition: opacity 360ms var(--ease-calm);
+}
+
+html.is-transitioning .site-header {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-standard);
+}
+
 .page-shell.page-exit,
 .page-shell.page-enter {
   pointer-events: none;
@@ -507,7 +527,9 @@ html.is-transitioning {
   .btn-cmk,
   .btn-cmk::before,
   .link-hover,
-  .link-hover::after {
+  .link-hover::after,
+  .project-listing-stage,
+  .site-header {
     transition: none;
   }
 }

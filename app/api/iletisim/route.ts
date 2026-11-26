@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   forwardWebLead,
   getContactFormConfig,
+  isWebLeadCreated,
   readContactPayload,
   validateContact,
   verifyRecaptcha,
@@ -9,7 +10,8 @@ import {
 import { allowRequest, clientKey } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
-  if (!allowRequest(clientKey(request))) {
+  const ip = clientKey(request);
+  if (!allowRequest(ip)) {
     return NextResponse.json(
       { ok: false, error: "Çok fazla deneme. Bir süre sonra yeniden deneyin." },
       { status: 429 },
@@ -51,11 +53,28 @@ export async function POST(request: Request) {
     if (!(await verifyRecaptcha(payload.recaptchaToken, captchaSecret))) {
       return NextResponse.json({ ok: false, error: "Güvenlik doğrulaması başarısız." }, { status: 400 });
     }
-    const upstream = await forwardWebLead(payload, crmBase, webhookSecret);
-    if (!upstream.ok) {
+
+    const upstream = await forwardWebLead(payload, crmBase, webhookSecret, {
+      ip,
+      userAgent: request.headers.get("user-agent") ?? undefined,
+    });
+
+    if (upstream.status === 429) {
+      console.warn("[iletisim] CRM hız sınırı aşıldı", { status: upstream.status });
+      return NextResponse.json(
+        { ok: false, error: "Çok fazla deneme. Bir süre sonra yeniden deneyin." },
+        { status: 429 },
+      );
+    }
+
+    if (!(await isWebLeadCreated(upstream))) {
+      console.error("[iletisim] CRM web-lead oluşturulamadı", { status: upstream.status });
       return NextResponse.json({ ok: false, error: "Mesajınız şu an iletilemedi." }, { status: 502 });
     }
-  } catch {
+  } catch (err) {
+    console.error("[iletisim] Form iletimi sırasında hata", {
+      error: err instanceof Error ? err.name : "UnknownError",
+    });
     return NextResponse.json({ ok: false, error: "Mesajınız şu an iletilemedi." }, { status: 502 });
   }
 

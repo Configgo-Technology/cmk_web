@@ -74,7 +74,7 @@ export default function Header() {
   return (
     <>
       <header
-        className="fixed inset-x-0 top-0 z-50 h-[120px] md:h-[140px]"
+        className="site-header fixed inset-x-0 top-0 z-50 h-[120px] md:h-[140px]"
         style={{ paddingRight: "var(--scrollbar-comp, 0px)" }}
       >
         <div

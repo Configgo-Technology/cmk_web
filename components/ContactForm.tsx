@@ -69,6 +69,7 @@ export default function ContactForm({
     }
 
     setPending(true);
+    let succeeded = false;
     try {
       const response = await fetch("/api/iletisim", {
         method: "POST",
@@ -79,7 +80,6 @@ export default function ContactForm({
           phone: form.get("phone"),
           project: form.get("project"),
           kvkkConsent,
-          commercialConsent: form.get("commercialConsent") === "on",
           recaptchaToken,
         }),
       });
@@ -88,11 +88,12 @@ export default function ContactForm({
         setError(data.error || "Mesajınız gönderilemedi.");
         return;
       }
+      succeeded = true;
       setDone(true);
     } catch {
       setError("Mesajınız gönderilemedi.");
     } finally {
-      if (id !== null) captcha?.reset(id);
+      if (!succeeded && id !== null) captcha?.reset(id);
       setPending(false);
     }
   }
@@ -180,24 +181,37 @@ export default function ContactForm({
         <span>
           <Link
             href="/kvkk"
+            target="_blank"
+            rel="noopener noreferrer"
             className="underline decoration-gold underline-offset-2 transition-colors duration-200 hover:text-gold"
           >
             Aydınlatma Metni
           </Link>
-          {" "}ve{" "}
+          ,{" "}
           <Link
             href="/acik-riza"
+            target="_blank"
+            rel="noopener noreferrer"
             className="underline decoration-gold underline-offset-2 transition-colors duration-200 hover:text-gold"
           >
             Açık Rıza Metni
           </Link>
-          &apos;ni okudum, onaylıyorum.
+          {" "}ve{" "}
+          <Link
+            href="/gizlilik"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-gold underline-offset-2 transition-colors duration-200 hover:text-gold"
+          >
+            Gizlilik Politikası
+          </Link>
+          &apos;nı okudum, kişisel verilerimin işlenmesini kabul ediyorum.
         </span>
       </label>
 
       <label className="flex cursor-pointer items-start gap-2 text-sm text-muted transition-colors duration-200 hover:text-ink">
         <input name="commercialConsent" type="checkbox" className="mt-1 cursor-pointer accent-gold" />
-        <span>Ticari elektronik ileti almak istiyorum.</span>
+        <span>Tarafıma SMS veya e-posta ile ticari elektronik ileti gönderilmesine izin veriyorum.</span>
       </label>
 
       <div className="flex justify-end">
