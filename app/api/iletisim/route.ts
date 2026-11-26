@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { forwardWebLead, readContactPayload, validateContact, verifyRecaptcha } from "@/lib/contact";
+import {
+  forwardWebLead,
+  getContactFormConfig,
+  readContactPayload,
+  validateContact,
+  verifyRecaptcha,
+} from "@/lib/contact";
 import { allowRequest, clientKey } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
@@ -11,19 +17,22 @@ export async function POST(request: Request) {
   }
 
   const length = Number(request.headers.get("content-length") ?? 0);
-  if (length > 20_000) {
+  if (Number.isFinite(length) && length > 20_000) {
     return NextResponse.json({ ok: false, error: "Gönderim kabul edilmedi." }, { status: 413 });
   }
 
-  const hasCaptcha = Boolean(process.env.RECAPTCHA_SECRET_KEY);
-  const hasCrmSecret = Boolean(process.env.CRM_WEBHOOK_SECRET ?? process.env.WEB_LEADS_WEBHOOK_SECRET);
-  if (process.env.NODE_ENV === "production" && (!hasCaptcha || !hasCrmSecret)) {
+  const { enabled, crmBase, captchaSecret, webhookSecret } = getContactFormConfig();
+  if (!enabled) {
     return NextResponse.json({ ok: false, error: "Form gönderimi şu an kapalı." }, { status: 503 });
   }
 
   let body: unknown;
   try {
-    body = await request.json();
+    const raw = await request.text();
+    if (raw.length > 20_000) {
+      return NextResponse.json({ ok: false, error: "Gönderim kabul edilmedi." }, { status: 413 });
+    }
+    body = JSON.parse(raw);
   } catch {
     return NextResponse.json({ ok: false, error: "Gönderim kabul edilmedi." }, { status: 400 });
   }
@@ -38,16 +47,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error }, { status: 400 });
   }
 
-  const captchaOk = await verifyRecaptcha(payload.recaptchaToken);
-  if (!captchaOk) {
-    return NextResponse.json({ ok: false, error: "Güvenlik doğrulaması başarısız." }, { status: 400 });
-  }
-
   try {
-    const upstream = await forwardWebLead(payload);
+    if (!(await verifyRecaptcha(payload.recaptchaToken, captchaSecret))) {
+      return NextResponse.json({ ok: false, error: "Güvenlik doğrulaması başarısız." }, { status: 400 });
+    }
+    const upstream = await forwardWebLead(payload, crmBase, webhookSecret);
     if (!upstream.ok) {
-      const status = upstream.status === 401 || upstream.status === 403 ? 502 : 502;
-      return NextResponse.json({ ok: false, error: "Mesajınız şu an iletilemedi." }, { status });
+      return NextResponse.json({ ok: false, error: "Mesajınız şu an iletilemedi." }, { status: 502 });
     }
   } catch {
     return NextResponse.json({ ok: false, error: "Mesajınız şu an iletilemedi." }, { status: 502 });

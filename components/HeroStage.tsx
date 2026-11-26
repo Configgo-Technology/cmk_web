@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 type HeroStageProps = {
   children: ReactNode;
@@ -18,37 +18,68 @@ export default function HeroStage({
   objectPosition = "72% center",
 }: HeroStageProps) {
   const track = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const mediaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let rafId = 0;
+    let lastProgress = -1;
+    let range = 0;
+
+    const measure = () => {
       const element = track.current;
-      if (!element) return;
-      const range = element.offsetHeight - window.innerHeight;
-      const traveled = Math.min(Math.max(-element.getBoundingClientRect().top, 0), Math.max(range, 0));
-      setProgress(range > 0 ? traveled / range : 0);
+      range = element ? Math.max(element.offsetHeight - window.innerHeight, 0) : 0;
     };
-    onScroll();
+
+    const update = () => {
+      rafId = 0;
+      const media = mediaRef.current;
+      if (!media) return;
+      const traveled = Math.min(Math.max(window.scrollY, 0), range);
+      const progress = range > 0 ? traveled / range : 0;
+      if (progress === lastProgress) return;
+      lastProgress = progress;
+      media.style.transform = `scale3d(${1 + progress * 0.1}, ${1 + progress * 0.1}, 1)`;
+    };
+
+    const onScroll = () => {
+      if (rafId === 0) {
+        rafId = requestAnimationFrame(update);
+      }
+    };
+
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+
+    measure();
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
     <div ref={track} className="relative h-[120vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
-        <Image
-          src={image}
-          alt={alt}
-          fill
-          priority
-          sizes="100vw"
-          quality={90}
-          className="object-cover will-change-transform"
-          style={{
-            objectPosition,
-            transform: `scale(${1 + progress * 0.1})`,
-          }}
-        />
+        <div ref={mediaRef} className="absolute inset-0 will-change-transform">
+          <Image
+            src={image}
+            alt={alt}
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            className="object-cover"
+            style={{ objectPosition }}
+          />
+        </div>
         {/* Soft left wash so white type stays readable without muddying the building */}
         <div
           className="absolute inset-0"

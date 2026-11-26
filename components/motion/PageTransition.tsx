@@ -5,9 +5,14 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 
 const EXIT_MS = 600;
 const ENTER_MS = 600;
+const ENTER_READY_MS = 420;
 
 function sameDocument(url: URL) {
   return url.origin === window.location.origin;
+}
+
+function reducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export default function PageTransition({ children }: { children: ReactNode }) {
@@ -16,28 +21,7 @@ export default function PageTransition({ children }: { children: ReactNode }) {
   const shell = useRef<HTMLDivElement>(null);
   const first = useRef(true);
   const pending = useRef(false);
-
-  useLayoutEffect(() => {
-    const main = document.querySelector("main");
-    if (!main) return;
-    const first = main.querySelector("section");
-    const sections = [...main.querySelectorAll("section")].filter((section) => section !== first);
-    const reveal = () => {
-      const limit = window.innerHeight * 0.88;
-      for (const section of sections) {
-        if (section.classList.contains("is-in")) continue;
-        if (section.getBoundingClientRect().top < limit) section.classList.add("is-in");
-      }
-    };
-    for (const section of sections) section.classList.add("scroll-reveal");
-    reveal();
-    window.addEventListener("scroll", reveal, { passive: true });
-    document.addEventListener("scroll", reveal, { passive: true, capture: true });
-    return () => {
-      window.removeEventListener("scroll", reveal);
-      document.removeEventListener("scroll", reveal, { capture: true });
-    };
-  }, [pathname]);
+  const exitTimer = useRef(0);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -50,6 +34,7 @@ export default function PageTransition({ children }: { children: ReactNode }) {
       const url = new URL(href, window.location.href);
       if (!sameDocument(url)) return;
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      if (reducedMotion()) return;
       if (pending.current) {
         event.preventDefault();
         event.stopPropagation();
@@ -59,15 +44,22 @@ export default function PageTransition({ children }: { children: ReactNode }) {
       event.preventDefault();
       event.stopPropagation();
       pending.current = true;
+      window.dispatchEvent(new Event("cmk:navigate-start"));
       document.documentElement.classList.add("is-transitioning");
       shell.current?.classList.remove("page-enter");
       shell.current?.classList.add("page-exit");
       const next = `${url.pathname}${url.search}${url.hash}`;
-      window.setTimeout(() => router.push(next), EXIT_MS);
+      window.clearTimeout(exitTimer.current);
+      exitTimer.current = window.setTimeout(() => {
+        router.push(next);
+      }, EXIT_MS);
     };
 
     document.addEventListener("click", onClick, true);
-    return () => document.removeEventListener("click", onClick, true);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      window.clearTimeout(exitTimer.current);
+    };
   }, [router]);
 
   useLayoutEffect(() => {
@@ -75,17 +67,42 @@ export default function PageTransition({ children }: { children: ReactNode }) {
       first.current = false;
       return;
     }
+
     const node = shell.current;
     if (!node) return;
+
+    window.clearTimeout(exitTimer.current);
     node.classList.remove("page-exit");
+
+    if (reducedMotion()) {
+      node.classList.remove("page-enter");
+      document.documentElement.classList.remove("is-transitioning");
+      pending.current = false;
+      window.dispatchEvent(new Event("cmk:page-ready"));
+      return;
+    }
+
     node.classList.add("page-enter");
     document.documentElement.classList.add("is-transitioning");
+
+    const readyTimeout = window.setTimeout(() => {
+      window.dispatchEvent(new Event("cmk:page-ready"));
+    }, ENTER_READY_MS);
+
     const timeout = window.setTimeout(() => {
       node.classList.remove("page-enter");
       document.documentElement.classList.remove("is-transitioning");
       pending.current = false;
+      window.dispatchEvent(new Event("cmk:page-ready"));
     }, ENTER_MS);
-    return () => window.clearTimeout(timeout);
+
+    return () => {
+      window.clearTimeout(readyTimeout);
+      window.clearTimeout(timeout);
+      node.classList.remove("page-enter");
+      document.documentElement.classList.remove("is-transitioning");
+      pending.current = false;
+    };
   }, [pathname]);
 
   return (

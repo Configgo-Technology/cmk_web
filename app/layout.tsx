@@ -3,8 +3,8 @@ import { Geist } from "next/font/google";
 import AboutBand from "@/components/AboutBand";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import PageTransition from "@/components/PageTransition";
-import Preloader from "@/components/Preloader";
+import PageTransition from "@/components/motion/PageTransition";
+import Preloader from "@/components/motion/Preloader";
 import "./globals.css";
 
 const geist = Geist({
@@ -59,8 +59,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="tr">
       <body className={`${geist.variable} antialiased`}>
         <Preloader />
+        <Header />
         <PageTransition>
-          <Header />
           {children}
           <AboutBand />
           <Footer />

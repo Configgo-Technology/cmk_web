@@ -38,8 +38,24 @@ export function validateContact(input: ContactPayload) {
   return null;
 }
 
-export async function verifyRecaptcha(token: string) {
-  const secret = process.env.RECAPTCHA_SECRET_KEY;
+export function getContactFormConfig() {
+  const crmBase = (process.env.CMK_CORE_URL?.trim() || "https://api.configgo.com/cmk-core").replace(/\/+$/, "");
+  const webhookSecret =
+    process.env.CRM_WEBHOOK_SECRET?.trim() || process.env.WEB_LEADS_WEBHOOK_SECRET?.trim() || "";
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+  const captchaSecret = process.env.RECAPTCHA_SECRET_KEY?.trim() ?? "";
+  const production = process.env.NODE_ENV === "production";
+  const hasCaptchaKeys = Boolean(siteKey && captchaSecret);
+  const enabled =
+    Boolean(crmBase) &&
+    (production
+      ? Boolean(webhookSecret) && hasCaptchaKeys
+      : hasCaptchaKeys || (!siteKey && !captchaSecret));
+
+  return { enabled, crmBase, webhookSecret, siteKey, captchaSecret };
+}
+
+export async function verifyRecaptcha(token: string, secret: string) {
   if (!secret) {
     return process.env.NODE_ENV !== "production";
   }
@@ -49,14 +65,11 @@ export async function verifyRecaptcha(token: string) {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ secret, response: token }),
+    signal: AbortSignal.timeout(8_000),
   });
   if (!response.ok) return false;
   const data = (await response.json()) as { success?: boolean };
   return data.success === true;
-}
-
-function crmBaseUrl() {
-  return (process.env.CMK_CORE_URL ?? "https://api.configgo.com/cmk-core").replace(/\/$/, "");
 }
 
 async function postWebLead(url: string, body: string, headers: HeadersInit) {
@@ -75,14 +88,13 @@ async function postWebLead(url: string, body: string, headers: HeadersInit) {
 }
 
 /** Canlı CRM: önce `/web-leads`, 404 olursa `/api/web-leads`. */
-export async function forwardWebLead(input: ContactPayload) {
-  const secret = process.env.CRM_WEBHOOK_SECRET ?? process.env.WEB_LEADS_WEBHOOK_SECRET ?? "";
+export async function forwardWebLead(input: ContactPayload, base: string, secret: string) {
   const payload = JSON.stringify({
     full_name: input.fullName,
     email: input.email,
     phone: input.phone,
     project: input.project,
-    kvkk_consent: true,
+    kvkk_consent: input.kvkkConsent,
   });
 
   const headers: Record<string, string> = {
@@ -91,7 +103,6 @@ export async function forwardWebLead(input: ContactPayload) {
   };
   if (secret) headers["X-Webhook-Secret"] = secret;
 
-  const base = crmBaseUrl();
   const primary = `${base}/web-leads`;
   let response = await postWebLead(primary, payload, headers);
 

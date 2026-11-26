@@ -17,7 +17,10 @@ export default function PrivacyPage() {
       </p>
       <p>
         Detaylı bilgilendirme için KVKK aydınlatma metnimizi inceleyebilir, sorularınız için{" "}
-        <a className="text-gold" href="mailto:info@cmk.com.tr">
+        <a
+          className="text-gold underline decoration-gold/40 underline-offset-4 transition-colors duration-200 hover:text-ink hover:decoration-ink"
+          href="mailto:info@cmk.com.tr"
+        >
           info@cmk.com.tr
         </a>{" "}
         adresine yazabilirsiniz.

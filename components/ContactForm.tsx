@@ -1,49 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import Script from "next/script";
+import { FormEvent, useRef, useState } from "react";
 import { leadProjects } from "@/data/site";
 
 declare global {
   interface Window {
     grecaptcha?: {
-      getResponse: () => string;
-      reset: () => void;
+      ready: (callback: () => void) => void;
+      render: (container: HTMLElement, options: { sitekey: string; size: "compact" | "normal" }) => number;
+      getResponse: (widgetId: number) => string;
+      reset: (widgetId: number) => void;
     };
   }
 }
 
 const fieldClass =
-  "w-full border border-line bg-white px-4 py-3 text-sm text-ink outline-none focus:border-gold";
+  "w-full border border-line bg-white px-4 py-3 text-sm text-ink outline-none transition-colors duration-200 hover:border-muted/60 focus:border-gold";
 
 export default function ContactForm({
+  enabled,
   siteKey,
-  captchaRequired,
 }: {
+  enabled: boolean;
   siteKey: string;
-  captchaRequired: boolean;
 }) {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [pending, setPending] = useState(false);
-  const closed = captchaRequired && !siteKey;
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+  const captchaContainer = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<number | null>(null);
+  const closed = !enabled;
 
-  useEffect(() => {
-    if (!siteKey || document.querySelector("script[data-recaptcha]")) return;
-    const script = document.createElement("script");
-    script.src = "https://www.google.com/recaptcha/api.js";
-    script.async = true;
-    script.dataset.recaptcha = "true";
-    document.body.appendChild(script);
-  }, [siteKey]);
+  function renderCaptcha() {
+    const container = captchaContainer.current;
+    const captcha = window.grecaptcha;
+    if (!container || !captcha) return;
+    captcha.ready(() => {
+      if (container !== captchaContainer.current || widgetId.current !== null) return;
+      widgetId.current = captcha.render(container, {
+        sitekey: siteKey,
+        size: container.clientWidth < 304 ? "compact" : "normal",
+      });
+    });
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
     if (closed || pending) return;
+    setError("");
 
-    const form = new FormData(event.currentTarget);
-    const recaptchaToken = siteKey ? window.grecaptcha?.getResponse() ?? "" : "";
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const kvkkConsent = form.get("kvkkConsent") === "on";
+    if (!kvkkConsent) {
+      setError("KVKK aydınlatma metnini onaylayın.");
+      return;
+    }
+
+    const captcha = window.grecaptcha;
+    const id = widgetId.current;
+    const recaptchaToken = id === null ? "" : captcha?.getResponse(id) ?? "";
     if (siteKey && !recaptchaToken) {
       setError("Güvenlik doğrulamasını tamamlayın.");
       return;
@@ -59,7 +78,7 @@ export default function ContactForm({
           email: form.get("email"),
           phone: form.get("phone"),
           project: form.get("project"),
-          kvkkConsent: form.get("kvkkConsent") === "on",
+          kvkkConsent,
           commercialConsent: form.get("commercialConsent") === "on",
           recaptchaToken,
         }),
@@ -67,36 +86,36 @@ export default function ContactForm({
       const data = (await response.json()) as { ok?: boolean; error?: string };
       if (!response.ok || !data.ok) {
         setError(data.error || "Mesajınız gönderilemedi.");
-        window.grecaptcha?.reset();
         return;
       }
       setDone(true);
-      event.currentTarget.reset();
-      window.grecaptcha?.reset();
     } catch {
       setError("Mesajınız gönderilemedi.");
     } finally {
+      if (id !== null) captcha?.reset(id);
       setPending(false);
     }
   }
 
   if (done) {
     return (
-      <p className="bg-white px-4 py-6 text-sm text-ink">
+      <p className="bg-white px-4 py-6 text-sm text-ink" role="status">
         Başvurunuz alındı. En kısa sürede size dönüş yapacağız.
       </p>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+    <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <input
           className={fieldClass}
           name="fullName"
           placeholder="Ad Soyad"
+          aria-label="Ad Soyad"
           autoComplete="name"
           required
+          minLength={2}
           maxLength={80}
         />
         <input
@@ -104,6 +123,7 @@ export default function ContactForm({
           name="email"
           type="email"
           placeholder="E-posta"
+          aria-label="E-posta"
           autoComplete="email"
           required
           maxLength={120}
@@ -111,12 +131,21 @@ export default function ContactForm({
         <input
           className={fieldClass}
           name="phone"
+          type="tel"
           placeholder="Telefon"
+          aria-label="Telefon"
           autoComplete="tel"
           required
+          minLength={7}
           maxLength={20}
         />
-        <select className={fieldClass} name="project" defaultValue="" required>
+        <select
+          className={`${fieldClass} cursor-pointer`}
+          name="project"
+          aria-label="İlgilendiğiniz proje"
+          defaultValue=""
+          required
+        >
           <option value="" disabled>
             Proje Seçiniz
           </option>
@@ -128,34 +157,65 @@ export default function ContactForm({
         </select>
       </div>
 
-      {siteKey ? <div className="g-recaptcha" data-sitekey={siteKey} /> : null}
+      {siteKey ? (
+        <>
+          <div ref={captchaContainer} className="min-h-[78px]" />
+          <Script
+            src="https://www.google.com/recaptcha/api.js?render=explicit"
+            onReady={renderCaptcha}
+            onError={() => setError("Güvenlik doğrulaması yüklenemedi. Lütfen sayfayı yenileyin.")}
+          />
+        </>
+      ) : null}
 
-      <label className="flex items-start gap-2 text-sm text-muted">
-        <input name="kvkkConsent" type="checkbox" className="mt-1" required />
+      <label className="flex cursor-pointer items-start gap-2 text-sm text-muted transition-colors duration-200 hover:text-ink">
+        <input
+          name="kvkkConsent"
+          type="checkbox"
+          className="mt-1 cursor-pointer accent-gold"
+          checked={kvkkAccepted}
+          onChange={(event) => setKvkkAccepted(event.currentTarget.checked)}
+          required
+        />
         <span>
-          <Link href="/kvkk" className="underline decoration-gold underline-offset-2 hover:text-gold">
+          <Link
+            href="/kvkk"
+            className="underline decoration-gold underline-offset-2 transition-colors duration-200 hover:text-gold"
+          >
             Aydınlatma Metni
           </Link>
           {" "}ve{" "}
-          <Link href="/acik-riza" className="underline decoration-gold underline-offset-2 hover:text-gold">
+          <Link
+            href="/acik-riza"
+            className="underline decoration-gold underline-offset-2 transition-colors duration-200 hover:text-gold"
+          >
             Açık Rıza Metni
           </Link>
           &apos;ni okudum, onaylıyorum.
         </span>
       </label>
 
-      <label className="flex items-start gap-2 text-sm text-muted">
-        <input name="commercialConsent" type="checkbox" className="mt-1" />
+      <label className="flex cursor-pointer items-start gap-2 text-sm text-muted transition-colors duration-200 hover:text-ink">
+        <input name="commercialConsent" type="checkbox" className="mt-1 cursor-pointer accent-gold" />
         <span>Ticari elektronik ileti almak istiyorum.</span>
       </label>
 
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={pending || closed}
-          className="bg-gold px-8 py-3 text-sm text-white disabled:opacity-60"
+          disabled={pending || closed || !kvkkAccepted}
+          className="btn-cmk btn-cmk-gold group inline-flex items-center gap-1.5 px-8 py-3 text-sm disabled:opacity-60"
         >
-          {pending ? "Gönderiliyor" : "Gönder →"}
+          {pending ? (
+            "Gönderiliyor"
+          ) : (
+            <>
+              <span>Gönder</span>
+              <span aria-hidden className="inline-block transition-transform duration-200 group-hover:translate-x-1">
+                →
+              </span>
+            </>
+          )}
         </button>
       </div>
       {closed ? <p className="text-sm text-muted">Form gönderimi şu an kapalı.</p> : null}

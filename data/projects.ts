@@ -374,7 +374,7 @@ export const projects: Project[] = [
     galleryLabel: "Nova Sanayi Sitesi",
     videoUrl: "https://youtu.be/RO0XSXdprHQ",
     mapQuery: "Nova Sanayi Sitesi, Ankara",
-    mapPoint: "https://maps.app.goo.gl/WJEhVpEPXLY1guCW9",
+    mapPoint: "https://maps.app.goo.gl/Ywvoejo9zyfvE2pJ9",
     hasDetail: true,
     excerpt: "CMK Holding tarafından hayata geçirilen Nova Sanayi Sitesi, modern mimarisi, geniş kullanım alanları ve verimlilik odaklı planlamasıyla üretim & ticaret sektörüne yönelik",
   },
@@ -1033,30 +1033,24 @@ export const listingSlugs = [
   "doner-sermaye",
 ] as const;
 
+const projectsBySlug = new Map(projects.map((project) => [project.slug, project]));
+
 export function getProject(slug: string) {
-  return projects.find((project) => project.slug === slug);
+  return projectsBySlug.get(slug);
 }
 
 export function getHomePreviewProjects(): Project[] {
   return homePreviewSlugs
-    .map((slug) => getProject(slug))
+    .map((slug) => projectsBySlug.get(slug))
     .filter((project): project is Project => Boolean(project));
 }
 
 export function getListingProjects(): Project[] {
   return listingSlugs
-    .map((slug) => getProject(slug))
+    .map((slug) => projectsBySlug.get(slug))
     .filter((project): project is Project => Boolean(project));
-}
-
-export function projectImage(slug: string, index = 1) {
-  return photo(slug, index);
 }
 
 export function projectGallery(slug: string) {
   return [1, 2, 3, 4, 5, 6, 7, 8].map((index) => photo(slug, index));
-}
-
-export function cardExcerpt(project: Project) {
-  return project.excerpt;
 }

@@ -14,7 +14,10 @@ export default function KvkkPage() {
       <p>
         Verileriniz, talebinizin niteliğine göre CRM sistemlerimize aktarılabilir ve yalnızca bu amaçla sınırlı
         olarak saklanır. Kanundan doğan haklarınızı kullanmak için{" "}
-        <a className="text-gold" href="mailto:info@cmk.com.tr">
+        <a
+          className="text-gold underline decoration-gold/40 underline-offset-4 transition-colors duration-200 hover:text-ink hover:decoration-ink"
+          href="mailto:info@cmk.com.tr"
+        >
           info@cmk.com.tr
         </a>{" "}
         adresine başvurabilirsiniz.
