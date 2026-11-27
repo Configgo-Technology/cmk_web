@@ -10,6 +10,7 @@ import { aboutCopy, homeHero } from "@/data/site";
 
 const preview = getHomePreviewProjects();
 
+
 export default function HomePage() {
   return (
     <main>
