@@ -63,9 +63,6 @@ export default function AboutPage() {
               </Reveal>
             ))}
           </div>
-
-          <Reveal variant="up" delay={200} className="mt-10 flex items-center gap-4 border-t border-line pt-8">
-          </Reveal>
         </div>
         <div className="mx-auto max-w-[1440px] px-5 pb-10 md:px-[70px]">
           <Reveal variant="scale" delay={120}>
